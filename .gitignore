@@ -1,0 +1,4 @@
+resources/settings.lua
+deps/
+.ftpconfig
+private/
