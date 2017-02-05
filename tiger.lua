@@ -11,10 +11,12 @@ local commands = require("./resources/commands.lua"){
 
 }
 
-local framework = require("./resources/framework.lua")(client)
-client.modules = framework:loadScript(module.dir.."/resources/modules/")
-client.settings = framework:loadScript(module.dir.."/resources/settings.lua")
 client.commands = commands
-client.framework = framework
-
-client:run(client.settings.token)
+coroutine.wrap(function()
+	local framework = require("./resources/framework.lua")(client)
+	client.modules = framework:loadScripts(module.dir.."/resources/modules/")
+	client.resolvers = framework:loadScripts(module.dir.."/resources/resolvers/")
+	client.settings = framework:loadScripts(module.dir.."/resources/settings.lua")
+	client.framework = framework
+	client:run(client.settings.token)
+end)()
