@@ -1,5 +1,6 @@
 local framework = {scripts={}}
 local fs = require("fs")
+local timer = require("timer")
 
 local client
 
@@ -8,7 +9,7 @@ local function init(bot)
 	return framework
 end
 
-function framework:loadScript(filePath,...)
+function framework:loadScripts(filePath,...)
 	local tuple = {...}
 	if filePath:find(".lua") then
 		local file
@@ -27,7 +28,9 @@ function framework:loadScript(filePath,...)
 		framework.scripts[fileName] = file
 		return file
 	else
-		fs.readdir(filePath,function(err,files)
+		local t = {}
+		local done
+		fs.readdir(filePath,function(err,files) --put in a coroutine
 			if files then
 				for i,v in pairs(files) do
 					local fileName = v:gsub(".lua","")
@@ -41,8 +44,10 @@ function framework:loadScript(filePath,...)
 							end
 						end)
 						if success then
+							t[fileName] = file
 							framework.scripts[fileName] = file
 						else
+							print(fileName)
 							print(filePath)
 							print(err)
 							p("-----------")
@@ -50,7 +55,12 @@ function framework:loadScript(filePath,...)
 					end
 				end
 			end
+			done = true
 		end)
+		while not done do
+			timer.sleep(1000)
+		end
+		return t
 	end
 end
 
