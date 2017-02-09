@@ -19,4 +19,5 @@ coroutine.wrap(function()
 	client.settings = framework:loadScripts(module.dir.."/resources/settings.lua")
 	client.framework = framework
 	client:run(client.settings.token)
+	client.site = require("./site/server.lua")(client)
 end)()
