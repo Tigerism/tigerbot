@@ -1,25 +1,47 @@
 local framework = {scripts={}}
-local fs = require("fs")
-local timer = require("timer")
+
+local lfs = require("lfs")
 
 local client
 
-local function init(bot)
-	client = bot
+local function init(...)
+	local tuple = ...
+	for i,v in pairs(...) do
+		framework.scripts[i] = v
+	end
+	client = tuple.litcord(tuple.settings.token)
+	registerListeners()
+	extendClient()
+	client:run()
 	return framework
+end
+
+function registerListeners()
+	framework:loadScripts("./resources/listeners")
+end
+
+function extendClient()
+	client.framework = framework
+end
+
+function framework:getHtml(file)
+	local f = io.open(file, "rb")
+	local content = f:read("*a")
+	f:close()
+	return content
 end
 
 function framework:loadScripts(filePath,...)
 	local tuple = {...}
 	if filePath:find(".lua") then
 		local file
-		local fileName = filePath:match("([^/]-)%..-$")
+		local fileName = filePath:match("([^/]-)%..-$")	
 		if framework.scripts[fileName] then return framework.scripts[fileName] end
 		local success, err = pcall(function()
 			if tuple and #tuple > 0 then
 				file = dofile(filePath)(client,tuple)
 			else
-				file = dofile(filePath)
+				file = dofile(filePath)(client)
 			end
 		end)
 		if not success then
@@ -28,41 +50,43 @@ function framework:loadScripts(filePath,...)
 		framework.scripts[fileName] = file
 		return file
 	else
-		local t = {}
-		local done
-		fs.readdir(filePath,function(err,files) --put in a coroutine
-			if files then
-				for i,v in pairs(files) do
-					local fileName = v:gsub(".lua","")
+		local files = {}
+		for file in lfs.dir(filePath) do
+			local currentFile
+			if file ~= "." and file ~= ".."  then
+				local f = filePath..'/'..file
+				local attr = lfs.attributes (f)
+				assert (type(attr) == "table")
+				if attr.mode == "directory" then
+					if tuple.recursive then
+						--SOON (TM)
+					end
+				else
+					local fileName = f:sub(2):match("([^/]-)%..-$")
 					if not framework.scripts[fileName] then
-						local file
 						local success, err = pcall(function()
 							if tuple and #tuple > 0 then
-								file = dofile(filePath..v)(client,tuple)
+								currentFile = dofile(f)(client,tuple)
 							else
-								file = dofile(filePath..v)(client)
+								currentFile = dofile(f)(client)
 							end
 						end)
 						if success then
-							t[fileName] = file
-							framework.scripts[fileName] = file
+							files[fileName] = currentFile
+							framework.scripts[fileName] = currentFile
 						else
+							print("-----------")
 							print(fileName)
 							print(filePath)
 							print(err)
-							p("-----------")
+							print("-----------")
 						end
 					end
 				end
 			end
-			done = true
-		end)
-		while not done do
-			timer.sleep(1000)
 		end
-		return t
+		return files
 	end
 end
-
 
 return init
