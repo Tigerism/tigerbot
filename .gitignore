@@ -1,2 +1,4 @@
 resources/settings.lua
 private/
+dependencies.txt
+site/

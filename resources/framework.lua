@@ -1,6 +1,8 @@
 local framework = {scripts={}}
+local dbs = {}
 
 local lfs = require("lfs")
+local r = require("rethinkdb")
 
 local client
 
@@ -11,17 +13,43 @@ local function init(...)
 	end
 	client = tuple.litcord(tuple.settings.token)
 	registerListeners()
+	establishDatabases()
 	extendClient()
 	client:run()
 	return framework
 end
 
 function registerListeners()
-	framework:loadScripts("./resources/listeners")
+	client.listeners = framework:loadScripts("./resources/listeners")
+end
+
+function establishDatabases()
+	client.db = r
+	local db = framework:loadScripts("./resources/db")
+	for i,v in pairs(db) do
+		r.connect(
+			{
+				host = 'localhost',
+				port = 28015,
+				db = i,
+				--password = ''
+			},
+			function(err, conn)
+				if conn then
+					dbs[i] = conn
+					client.db[i] = conn
+				else
+					print("RETHINKDB ERROR: "..err)
+				end
+			end
+		)
+	end
+
 end
 
 function extendClient()
 	client.framework = framework
+	--client.site = framework:loadScripts("./site/server.lua")
 end
 
 function framework:getHtml(file)
@@ -45,6 +73,11 @@ function framework:loadScripts(filePath,...)
 			end
 		end)
 		if not success then
+			print("-----------")
+			print(fileName)
+			print(filePath)
+			print(err)
+			print("-----------")
 			return
 		end
 		framework.scripts[fileName] = file
