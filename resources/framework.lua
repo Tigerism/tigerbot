@@ -4,6 +4,9 @@ local dbs = {}
 local lfs = require("lfs")
 local r = require("rethinkdb")
 
+local sub,find = string.sub, string.find
+local insert,concat = table.insert, table.concat
+
 local client
 
 local function init(...)
@@ -49,7 +52,8 @@ end
 
 function extendClient()
 	client.framework = framework
-	--client.site = framework:loadScripts("./site/server.lua")
+	client.commands = require("resources.commands")(client,{prefixes={"tiger "}})
+	client.resolvers = framework:loadScripts("./resources/resolvers/")
 end
 
 function framework:getHtml(file)
@@ -57,6 +61,27 @@ function framework:getHtml(file)
 	local content = f:read("*a")
 	f:close()
 	return content
+end
+
+function framework:split(str, delim)
+	--credit to finitreality
+	if (not str) or (not delim) or str == "" or delim == "" then
+		return {}
+	else
+		local current = 1
+		local result = { }
+		while true do
+			local start, finish = find(str, delim, current)
+			if start and finish then
+				insert(result, sub(str, current, start-1))
+				current = finish + 1
+			else
+				break
+			end
+		end
+		insert(result, sub(str, current))
+		return result
+	end
 end
 
 function framework:loadScripts(filePath,...)
