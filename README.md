@@ -1,3 +1,3 @@
 # Tigerbot
 
-A discord bot written in **pure lua**
+A Discord bot written in Lua for the Luvit runtime environment.

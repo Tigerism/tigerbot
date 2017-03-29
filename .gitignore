@@ -2,3 +2,5 @@ resources/settings.lua
 private/
 dependencies.txt
 site/
+litcord/
+deps/

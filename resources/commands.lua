@@ -3,7 +3,9 @@ local Data
 
 local function init(client,data)
 	Data = data
-	local commands = client.framework:loadScripts("./commands/")
+	--local commands = client.framework:loadScripts(module.dir.."/../commands/")
+	local commands = {}
+	p("commands:",commands)
 	for i,v in pairs(commands) do
 		Command(i,v)
 	end
@@ -39,11 +41,14 @@ local function checkMatch(client,prefix,message)
 		local args = client.framework:split(after," ")
 		for i,v in pairs(Command.commands) do
 			if args[1] and args[1]:lower() == v.label:lower() then
+				table.remove(args,1)
 				--checks for permissions
 				if v.args and #v.args > 0 then
 					--argument resolver
-					local arguments = client.resolvers.argument:extract(v,args,message)
-					
+					local match = client.resolvers.argument:extract(v,args,message)
+					if match then
+						
+					end
 				end
 			end
 		end
