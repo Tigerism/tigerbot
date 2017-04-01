@@ -1,9 +1,8 @@
-return function(client)
+
 	
-	return {
-		arguments = {"user"},
-		func = function(message)
-			
-		end
-	}
-end
+return {
+	arguments = {},
+	func = function(message)
+		return "pong"	
+	end
+}

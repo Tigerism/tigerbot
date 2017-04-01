@@ -58,8 +58,9 @@ coroutine.wrap(function()
 				line[1] = os.date(fmt)
 				line[3] = data
 				local error = data:match("Uncaught Error: (.*)stack traceback:")
-				if error then
-			    	sendLog("Master",error,"12597547")
+				local error2 = data:match("Uncaught exception:(.*)stack traceback:")
+				if error or error2 then
+			    	sendLog("Master",(error or error2),"12597547")
 				end
 				fs.write(log, line)
 			end

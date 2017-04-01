@@ -13,13 +13,6 @@ local splitPath, pathJoin = pathjoin.splitPath, pathjoin.pathJoin
 local readFile, scandir = fs.readFileSync, fs.scandirSync
 local remove, insert, concat = table.remove, table.insert, table.concat
 local sub,find = string.sub, string.find
-	
---[[ function framework:reloadModule(name)
-	if client.listeners[name] then
-		client:removeListener(name,client.listeners[name])
-		client.listeners[name] = framework:loadScripts(module.dir.."/listeners/"..name..".lua",true)
-	end
-end]]
 
 function framework:getHtml(file)
 	local f = io.open(file, "rb")
@@ -62,7 +55,7 @@ local function scan(path, name)
     end
 end
 
-function framework:loadScripts(filePath,noCache,...)
+--[[function framework:loadScripts(filePath,noCache,...)
 	local tuple = {...}
 	if filePath:find(".lua") then
 		local file
@@ -110,45 +103,35 @@ function framework:loadScripts(filePath,noCache,...)
 		end
 		return t
 	end
-end
+end]]
 
 
-local function loadModule(path)
+function framework:loadModule(path)
     local code = assert(readFile(path))
     local name = remove(splitPath(path))
     local fn = assert(loadstring(code, name, 't', env))
     framework.modules[name] = fn
-    return fn
+    return fn()
 end
 
-local function loadModules(path)
-	local fns = {modules={}}
+function framework:loadModules(path)
+	local fns = {}
     for k, v in scandir(path) do
         if v == 'file' and k:find(".lua") then
-        	local fn = loadModule(pathJoin(path, k))
+        	local fn = framework:loadModule(pathJoin(path, k))
         	local name = k:gsub(".lua","")
-        	fns.modules[name] = {fn,path}
-        	
+        	fns[name] = {fn,path}
         end
-    end
-    function fns:run(moduleName)
-    	if moduleName then
-    		return fns.modules[moduleName]()
-    	else
-    		for i,v in pairs(fns.modules) do
-    			v[1]()
-    		end
-    	end
     end
     return fns
 end
 
 local function reloadModule(moduleName)
-	local Module = framework.modules[moduleName]
-	if Module then
+	local module = framework.modules[moduleName]
+	if module then
 		local fn
 		local success, err = pcall(function()
-			fn = loadModule(Module.path)
+			fn = framework:loadModule(module[2])
 		end)
 		if success then
 			framework.modules[moduleName] = fn
@@ -159,10 +142,10 @@ local function reloadModule(moduleName)
 end
 
 local function registerModules()
-	framework.modules["listeners"] = loadModules(module.dir.."/listeners/"):run()
-	framework.modules["resolvers"] = loadModules(module.dir.."/resolvers/"):run()
-	framework.modules["commands"] = loadModule(module.dir.."/commands.lua")()
-	framework.modules["logger"] = loadModule(module.dir.."/logger.lua")()
+	framework.modules["listeners"] = framework:loadModules(module.dir.."/listeners/")
+	framework.modules["resolvers"] = framework:loadModules(module.dir.."/resolvers/")
+	framework.modules["commands"] = framework:loadModule(module.dir.."/commands.lua")
+	framework.modules["logger"] = framework:loadModule(module.dir.."/logger.lua")
 	client.framework = framework
 end
 
@@ -177,7 +160,8 @@ local function init(bot,...)
     	require = require,
     	client = client,
 		modules = framework.modules,
-		framework = framework
+		framework = framework,
+		module = module
 	}, {__index = _G})
 	registerModules()
 	return framework

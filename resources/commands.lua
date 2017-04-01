@@ -1,29 +1,23 @@
 local Command = {commands={}}
 local Data
 
-local function init(client,data)
-	Data = data
-	--local commands = client.framework:loadScripts(module.dir.."/../commands/")
-	local commands = {}
-	p("commands:",commands)
-	for i,v in pairs(commands) do
-		Command(i,v)
-	end
-	return Command
-end
+local commands = framework:loadModules(module.dir.."/../commands/")
+p(commands.ping[1].arguments)
+
 
 setmetatable(Command,{
     __call = function(self,label,stuff)
 		local mt = setmetatable({
-      label = label,
+    		label = label,
 			options = stuff.options or {},
 			func = stuff.func,
 			args = stuff.arguments or {}
     },self)
-		Command.commands[label] = mt
+	Command.commands[label] = mt
 end})
 
 local function isNotAllowed()
+	
 end
 
 function Command:newSubcommand(label,funct,options)
@@ -31,9 +25,10 @@ function Command:newSubcommand(label,funct,options)
 end
 
 local function executeCommand(mt)
+	
 end
 
-local function checkMatch(client,prefix,message)
+local function checkMatch(prefix,message)
 	local content = message.content
 	local beginning = content:sub(1,prefix:len()):lower()
 	if beginning == prefix:lower() then
@@ -58,14 +53,14 @@ end
 function Command:newMessage(message)
 	local content = message.content
 	local channel = message.channel
-	local client = message.client
-	for _,v in pairs(Data.prefixes) do
-		local command = checkMatch(client,v,message)
+	--[[for _,v in pairs(Data.prefixes) do
+		local command = checkMatch(v,message)
 		if command then
 			
 		end
-	end
+	end]]
+
 end
 
 
-return init
+return Command
