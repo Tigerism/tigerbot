@@ -162,7 +162,8 @@ local function registerModules()
 	framework.modules["listeners"] = loadModules(module.dir.."/listeners/"):run()
 	framework.modules["resolvers"] = loadModules(module.dir.."/resolvers/"):run()
 	framework.modules["commands"] = loadModule(module.dir.."/commands.lua")()
-	
+	framework.modules["logger"] = loadModule(module.dir.."/logger.lua")()
+	client.framework = framework
 end
 
 local function init(bot,...)
