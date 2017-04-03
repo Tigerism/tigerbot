@@ -9,7 +9,7 @@ local json = require("json")
 
 local fmt = '!%Y-%m-%d %H:%M:%S'
 
-local cmd = ""
+local cmd = "discord/tiger/tiger.lua"
 local settings = require(module.dir.."/resources/settings.lua")
 local webhook = "https://discordapp.com/api/webhooks/"..settings.logger.status[1].."/"..settings.logger.status[2]
 
@@ -60,6 +60,7 @@ coroutine.wrap(function()
 				local error = data:match("Uncaught Error: (.*)stack traceback:")
 				local error2 = data:match("Uncaught exception:(.*)stack traceback:")
 				if error or error2 then
+					p(error,error2)
 			    	sendLog("Master",(error or error2),"12597547")
 				end
 				fs.write(log, line)
