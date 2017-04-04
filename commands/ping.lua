@@ -4,11 +4,11 @@ return {
 	--Permissions
 },function(message)
 
-	return locale.currentCommand().pong --just so I can remember how to do the locale
+	--return locale.currentCommand().pong
 	
 end,{
 	--args
 },{
-	--flags
+	--subcommands
 }
 

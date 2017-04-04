@@ -55,17 +55,23 @@ local function scan(path, name)
     end
 end
 
-function framework:loadModule(path)
+function framework:loadModule(path,extendedEnv)
     local code = assert(readFile(path))
     local name = remove(splitPath(path))
     local newEnv = env
-	if path:find("commands") then
-		--todo: make this better??
-	--	newEnv["locale"] = framework.modules.locale[name]:getWords()
-	end
+    if extendedEnv then
+    	for i,v in pairs(extendedEnv) do
+    		newEnv[i] = v
+    	end
+    end
     local fn = assert(loadstring(code, name, 't', newEnv))
     framework.modules[name] = fn
-    return fn()
+    local returnStuff = {fn()}
+    if #returnStuff == 1 then
+    	return returnStuff[1]
+    else
+    	return returnStuff
+    end
 end
 
 function framework:loadModules(path)

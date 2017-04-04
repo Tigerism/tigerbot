@@ -6,8 +6,17 @@ local commands = framework:getFiles(module.dir.."/../commands/")
 
 
 local function isAllowed()
+	return true
+end
+
+local function makeCommand(message,path)
+	local command = framework:loadModule(path,{
+		--locale stuff here	
+	})
+	return command
 	
 end
+
 
 local function checkMatch(prefix,message)
 	local content = message.content
@@ -18,7 +27,16 @@ local function checkMatch(prefix,message)
 		for i,v in pairs(commands) do
 			if args[1] and args[1]:lower() == i:lower() then
 				table.remove(args,1)
-				--rest later
+				--checks for permissions
+				if isAllowed() then
+					--temp permission thing
+					if true then
+						--another temp thing for something else
+						--ALL CHECKS HAVE PASSED, let's make le command 
+						local command = makeCommand(message,v)
+						p(command)
+					end
+				end
 			end
 		end
 	end
