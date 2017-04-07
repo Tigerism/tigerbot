@@ -1,12 +1,9 @@
-
-	
 return {
 	--Permissions
 	type = "permissions"
 },function(message)
-    --lalalla
-	--return locale.currentCommand().pong
-	return "test"
+    local newMsg = message.channel:sendMessage("pinging...")
+    newMsg:setContent(locale.currentCommand.pong(math.abs(math.floor(((newMsg.createdAt - message.createdAt)*1000)))))
 end,{
     type = "args"
 	--args

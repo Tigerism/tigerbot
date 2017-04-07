@@ -7,15 +7,23 @@ local function isAllowed()
 	return true
 end
 
-local function makeCommand(message,path)
+local function makeCommand(message,name,path)
+	local locale = locale("en",name)
 	local command = framework:loadModule(path,{
-		--locale stuff here	
+		locale = locale
 	})
-	command = {command()}
-	return command
+	if command then
+		command = {command()}
+		return command
+	end
 	
 end
 
+local respond = {}
+function respond:embed(...)
+	local embed = {}
+	--soonTM
+end
 
 local function checkMatch(prefix,message)
 	local content = message.content
@@ -32,7 +40,8 @@ local function checkMatch(prefix,message)
 					if true then
 						--another temp thing for something else
 						--ALL CHECKS HAVE PASSED, let's make le command 
-						local command = makeCommand(message,v)
+						local command = makeCommand(message,i,v)
+						command.args = args
 						return command
 					end
 				end
@@ -46,8 +55,21 @@ function Command:newMessage(message)
 	local channel = message.channel
 	for _,v in pairs(prefixes) do
 		local command = checkMatch(v,message)
-		if command then
-				
+		if command and not command.error then
+			for i,v in pairs(command) do
+				if type(v) == "function" then
+					local success, msg = pcall(v,message)
+					if success then
+						if msg then
+							channel:sendMessage(msg)
+						end
+					else
+						channel:sendMessage(":warning: This command has failed execution!\nError information: ``"..msg.."``")
+					end
+				end
+			end
+		elseif command and command.error then
+			channel:sendMessage(":warning: This command has failed execution!\nError information: ``"..command.error.."``")
 		end
 	end
 end

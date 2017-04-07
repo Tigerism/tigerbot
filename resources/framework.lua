@@ -15,16 +15,16 @@ local sub,find = string.sub, string.find
 
 
 local function getNewEnv(extended)
-	local env
-	env = setmetatable({
+	local env = setmetatable({
     	require = require,
     	client = client,
 		modules = framework.modules,
 		framework = framework,
 		module = module,
-		settings = client.settings
+		settings = client.settings,
+		locale = framework.modules.locale
 	}, {__index = _G})
-	if extended then
+	if extended and type(extended) == "table" then
 		for i,v in pairs(extended) do
 			env[i] = v
 		end
@@ -76,7 +76,10 @@ function framework:loadModule(path,env)
     local code = assert(readFile(path))
     local name = remove(splitPath(path))
     env = getNewEnv(env)
-    local fn = loadstring(code, name, 't', env)
+    local fn, error = loadstring(code, name, 't', env)
+    if not fn then
+    	return {error=error}
+    end
 	return fn
 end
 
@@ -94,13 +97,13 @@ end
 
 function framework:getFiles(path,recursive)
 	local files = {}
-    for k, v in scandir(path) do
-        if v == 'file' and k:find(".lua") then
-        	local name = k:gsub(".lua","")
-        	files[name] = path..name..".lua"
-        end
-    end
-    return files
+	for k, v in scandir(path) do
+		if v == 'file' and k:find(".lua") then
+			local name = k:gsub(".lua","")
+			files[name] = path..name..".lua"
+		end
+	end
+	return files
 end
 
 local function reloadModule(moduleName)
@@ -119,10 +122,11 @@ local function reloadModule(moduleName)
 end
 
 local function registerModules()
+	framework.modules["locale"] = framework:loadModule(module.dir.."/locale.lua")()
 	framework.modules["listeners"] = framework:loadModules(module.dir.."/listeners/")
 	framework.modules["resolvers"] = framework:loadModules(module.dir.."/resolvers/")
-	framework.modules["commands"] = framework:loadModule(module.dir.."/commands.lua")()
 	framework.modules["logger"] = framework:loadModule(module.dir.."/logger.lua")()
+	framework.modules["commands"] = framework:loadModule(module.dir.."/commands.lua")()
 	client.framework = framework
 end
 
