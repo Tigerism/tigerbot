@@ -73,7 +73,6 @@ local function scan(path, name)
 end
 
 function framework:loadModule(path,env)
-	local tuple = ...
     local code = assert(readFile(path))
     local name = remove(splitPath(path))
     env = getNewEnv(env)
