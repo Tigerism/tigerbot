@@ -1,7 +1,6 @@
 local framework = {scripts={},modules={}}
 
 local client
-local env
 
 local fs = require('fs')
 local pathjoin = require('pathjoin')
@@ -14,6 +13,24 @@ local readFile, scandir = fs.readFileSync, fs.scandirSync
 local remove, insert, concat = table.remove, table.insert, table.concat
 local sub,find = string.sub, string.find
 
+
+local function getNewEnv(extended)
+	local env
+	env = setmetatable({
+    	require = require,
+    	client = client,
+		modules = framework.modules,
+		framework = framework,
+		module = module,
+		settings = client.settings
+	}, {__index = _G})
+	if extended then
+		for i,v in pairs(extended) do
+			env[i] = v
+		end
+	end
+	return env
+end
 function framework:getHtml(file)
 	local f = io.open(file, "rb")
 	local content = f:read("*a")
@@ -55,23 +72,13 @@ local function scan(path, name)
     end
 end
 
-function framework:loadModule(path,extendedEnv)
+function framework:loadModule(path,env)
+	local tuple = ...
     local code = assert(readFile(path))
     local name = remove(splitPath(path))
-    local newEnv = env
-    if extendedEnv then
-    	for i,v in pairs(extendedEnv) do
-    		newEnv[i] = v
-    	end
-    end
-    local fn = assert(loadstring(code, name, 't', newEnv))
-    framework.modules[name] = fn
-    local returnStuff = {fn()}
-    if #returnStuff == 1 then
-    	return returnStuff[1]
-    else
-    	return returnStuff
-    end
+    env = getNewEnv(env)
+    local fn = loadstring(code, name, 't', env)
+	return fn
 end
 
 function framework:loadModules(path)
@@ -79,8 +86,8 @@ function framework:loadModules(path)
     for k, v in scandir(path) do
         if v == 'file' and k:find(".lua") then
         	local fn = framework:loadModule(pathJoin(path, k))
-        	local name = k:gsub(".lua","")
-        	fns[name] = {fn,path}
+	        local name = k:gsub(".lua","")
+	        fns[name] = {fn(),path}
         end
     end
     return fns
@@ -115,8 +122,8 @@ end
 local function registerModules()
 	framework.modules["listeners"] = framework:loadModules(module.dir.."/listeners/")
 	framework.modules["resolvers"] = framework:loadModules(module.dir.."/resolvers/")
-	framework.modules["commands"] = framework:loadModule(module.dir.."/commands.lua")
-	framework.modules["logger"] = framework:loadModule(module.dir.."/logger.lua")
+	framework.modules["commands"] = framework:loadModule(module.dir.."/commands.lua")()
+	framework.modules["logger"] = framework:loadModule(module.dir.."/logger.lua")()
 	client.framework = framework
 end
 
@@ -127,14 +134,6 @@ local function init(bot,...)
 		framework.scripts[i] = v
 		client[i] = v
 	end
-	env = setmetatable({
-    	require = require,
-    	client = client,
-		modules = framework.modules,
-		framework = framework,
-		module = module,
-		settings = client.settings
-	}, {__index = _G})
 	registerModules()
 	return framework
 end

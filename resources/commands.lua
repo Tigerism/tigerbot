@@ -3,8 +3,6 @@ local prefixes = settings.prefixes
 
 local commands = framework:getFiles(module.dir.."/../commands/")
 
-
-
 local function isAllowed()
 	return true
 end
@@ -13,6 +11,7 @@ local function makeCommand(message,path)
 	local command = framework:loadModule(path,{
 		--locale stuff here	
 	})
+	command = {command()}
 	return command
 	
 end
@@ -34,7 +33,7 @@ local function checkMatch(prefix,message)
 						--another temp thing for something else
 						--ALL CHECKS HAVE PASSED, let's make le command 
 						local command = makeCommand(message,v)
-						p(command)
+						return command
 					end
 				end
 			end
@@ -48,10 +47,9 @@ function Command:newMessage(message)
 	for _,v in pairs(prefixes) do
 		local command = checkMatch(v,message)
 		if command then
-			
+				
 		end
 	end
-
 end
 
 

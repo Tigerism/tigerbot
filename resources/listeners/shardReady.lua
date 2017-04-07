@@ -9,7 +9,7 @@ local function getGuildCount(shardId)
 end
 
 local function shardReady(shardId)
-	client.framework.modules["logger"]:sendLog("Shard "..shardId,"Connected to "..getGuildCount(shardId).." guilds.","8901500")
+--	client.framework.modules["logger"]:sendLog("Shard "..shardId,"Connected to "..getGuildCount(shardId).." guilds.","8901500")
 end
 
-client:on("shardReady",shardReady)
+--client:on("shardReady",shardReady)
