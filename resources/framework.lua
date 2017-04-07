@@ -22,7 +22,8 @@ local function getNewEnv(extended)
 		framework = framework,
 		module = module,
 		settings = client.settings,
-		locale = framework.modules.locale
+		locale = framework.modules.locale,
+		db = framework.modules.db
 	}, {__index = _G})
 	if extended and type(extended) == "table" then
 		for i,v in pairs(extended) do
@@ -123,6 +124,7 @@ end
 
 local function registerModules()
 	framework.modules["locale"] = framework:loadModule(module.dir.."/locale.lua")()
+	framework.modules["db"] = framework:loadModule(module.dir.."/db.lua")()
 	framework.modules["listeners"] = framework:loadModules(module.dir.."/listeners/")
 	framework.modules["resolvers"] = framework:loadModules(module.dir.."/resolvers/")
 	framework.modules["logger"] = framework:loadModule(module.dir.."/logger.lua")()

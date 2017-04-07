@@ -22,11 +22,13 @@ end
 
 setmetatable(locale,{
     __call = function(self,language,name)
-    return setmetatable({
-      language = language or "en",
-      name = name,
-      currentCommand = locale[language][name]
-    },self)
+        language = locale[language] and language or "en"
+        return setmetatable({
+          language = language or "en",
+          name = name,
+          currentCommand = locale[language][name]
+        },
+    self)
 end})
 
 return locale

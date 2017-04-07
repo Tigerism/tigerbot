@@ -8,7 +8,7 @@ local function isAllowed()
 end
 
 local function makeCommand(message,name,path)
-	local locale = locale("en",name)
+	local locale = locale(db:get("guilds/"..message.guild.id.."/locale"),name)
 	local command = framework:loadModule(path,{
 		locale = locale
 	})
@@ -54,11 +54,11 @@ function Command:newMessage(message)
 	local content = message.content
 	local channel = message.channel
 	for _,v in pairs(prefixes) do
-		local command = checkMatch(v,message)
+		local command,args = checkMatch(v,message)
 		if command and not command.error then
 			for i,v in pairs(command) do
 				if type(v) == "function" then
-					local success, msg = pcall(v,message)
+					local success, msg = pcall(v,message,command.args)
 					if success then
 						if msg then
 							channel:sendMessage(msg)
