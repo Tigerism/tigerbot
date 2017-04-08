@@ -3,8 +3,38 @@ local prefixes = settings.prefixes
 
 local commands = framework:getFiles(module.dir.."/../commands/")
 
-local function isAllowed()
-	return true
+local function checkPermissions(message,command)
+	local member = message.member
+	local author = message.author
+	local guild = message.guild
+	--if author.id == "260157417445130241" then return end
+	for i,v in pairs(command) do
+		if type(v) == "table" and v.type == "permissions" then
+			if v.roles then
+				for l,k in pairs(v.roles) do
+					local role = guild:getRole("name",k)
+					if role then
+						if not member:hasRole(role) then
+							return "Missing role: "..k
+						end
+					else
+						return "Missing role: "..k
+					end
+				end
+			elseif v.ids then
+				local badId = true
+				for l,k in pairs(v.ids) do
+					if k == author.id then
+						badId = false
+						break
+					end
+				end
+				if badId then
+					return "Restricted command."
+				end
+			end
+		end
+	end
 end
 
 local function makeCommand(message,name,path)
@@ -27,6 +57,7 @@ end
 
 local function checkMatch(prefix,message)
 	local content = message.content
+	local channel = message.channel
 	local beginning = content:sub(1,prefix:len()):lower()
 	if beginning == prefix:lower() then
 		local after = content:sub(beginning:len()+1)
@@ -34,13 +65,15 @@ local function checkMatch(prefix,message)
 		for i,v in pairs(commands) do
 			if args[1] and args[1]:lower() == i:lower() then
 				table.remove(args,1)
+				
 				--checks for permissions
-				if isAllowed() then
-					--temp permission thing
+				local command = makeCommand(message,i,v)
+				local isNotAllowed = checkPermissions(message,command)
+				if isNotAllowed then
+					channel:sendMessage(":x: Insufficient permissions! ``"..isNotAllowed.."``")
+				else
 					if true then
 						--another temp thing for something else
-						--ALL CHECKS HAVE PASSED, let's make le command 
-						local command = makeCommand(message,i,v)
 						command.args = args
 						return command
 					end
