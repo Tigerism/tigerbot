@@ -14,7 +14,7 @@ for name, file in pairs(translations) do
                 for i,v in pairs(tuple) do
                    content = content:gsub("{{arg"..i.."}}",v)
                 end
-                return ":tiger: Grr! ➜ "..content
+                return content
             end
         end
     end

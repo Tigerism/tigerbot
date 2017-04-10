@@ -3,6 +3,6 @@ return function(message)
     newMsg:setContent(locale.currentCommand.pong(math.abs(math.floor(((newMsg.createdAt - message.createdAt)*1000)))))
 end,
 {
-    description="shows latency information",
+    description=locale.currentCommand.description(),
     category="misc"
 }

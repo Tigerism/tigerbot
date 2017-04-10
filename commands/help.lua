@@ -1,10 +1,10 @@
-
+p(locale)
 local function generateCommandHelp(message)
     local channel = message.channel
     local commandList = {}
     local embed = {
-        title = ":question: Help for Tiger 2.0",
-        description = "Hello! I'm Tiger, a bot written in Lua with the Discordia library.\nUse the reaction buttons to filter through the command list.\n\nOfficial links: [Discord Server](https://discord.gg/62qYz8J) | [Invite](https://discordapp.com/oauth2/authorize?&client_id=225079733799485441&scope=bot&permissions=8)",
+        title = locale.currentCommand.embedTitle(),
+        description = locale.currentCommand.embedDescription(),
         fields = {}
     }
     local categories = {}
@@ -33,7 +33,7 @@ end
 
 
 return {
-    description = "shows this menu"
+    description = locale.currentCommand.description()
 },
 {
 	--Permissions
