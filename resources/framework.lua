@@ -90,7 +90,11 @@ function framework:loadModules(path)
         if v == 'file' and k:find(".lua") then
         	local fn = framework:loadModule(pathJoin(path, k))
 	        local name = k:gsub(".lua","")
-	        fns[name] = {fn(),path}
+	        if type(fn) == "table" and fn.error then
+	        	p(fn.error)
+	        else
+	        	fns[name] = {fn(),path}
+	        end
         end
     end
     return fns
@@ -128,6 +132,7 @@ local function registerModules()
 	framework.modules["listeners"] = framework:loadModules(module.dir.."/listeners/")
 	framework.modules["resolvers"] = framework:loadModules(module.dir.."/resolvers/")
 	framework.modules["logger"] = framework:loadModule(module.dir.."/logger.lua")()
+	framework.modules["pagination"] = framework:loadModule(module.dir.."/pagination.lua")()
 	framework.modules["commands"] = framework:loadModule(module.dir.."/commands.lua")()
 	client.framework = framework
 end

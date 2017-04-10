@@ -1,13 +1,12 @@
-local Command = {commands={}}
+local Command = {commands=framework:getFiles(module.dir.."/../commands/")}
 local prefixes = settings.prefixes
 
-local commands = framework:getFiles(module.dir.."/../commands/")
-
-local function checkPermissions(message,command)
+function Command:checkPermissions(message,command)
 	local member = message.member
 	local author = message.author
 	local guild = message.guild
 	--if author.id == "260157417445130241" then return end
+	--local permissions = db:get("guilds/"..guild.id.."/permissions") or {}
 	for i,v in pairs(command) do
 		if type(v) == "table" and v.type == "permissions" then
 			if v.roles then
@@ -37,10 +36,11 @@ local function checkPermissions(message,command)
 	end
 end
 
-local function makeCommand(message,name,path)
+function Command:makeCommand(message,name,path)
 	local locale = locale(db:get("guilds/"..message.guild.id.."/locale"),name)
 	local command = framework:loadModule(path,{
-		locale = locale
+		locale = locale,
+		command = Command
 	})
 	if command then
 		command = {command()}
@@ -62,13 +62,13 @@ local function checkMatch(prefix,message)
 	if beginning == prefix:lower() then
 		local after = content:sub(beginning:len()+1)
 		local args = client.framework:split(after," ")
-		for i,v in pairs(commands) do
+		for i,v in pairs(Command.commands) do
 			if args[1] and args[1]:lower() == i:lower() then
 				table.remove(args,1)
 				
 				--checks for permissions
-				local command = makeCommand(message,i,v)
-				local isNotAllowed = checkPermissions(message,command)
+				local command = Command:makeCommand(message,i,v)
+				local isNotAllowed = Command:checkPermissions(message,command)
 				if isNotAllowed then
 					channel:sendMessage(":x: Insufficient permissions! ``"..isNotAllowed.."``")
 				else
@@ -87,7 +87,7 @@ function Command:newMessage(message)
 	local content = message.content
 	local channel = message.channel
 	for _,v in pairs(prefixes) do
-		local command,args = checkMatch(v,message)
+		local command = checkMatch(v,message)
 		if command and not command.error then
 			for i,v in pairs(command) do
 				if type(v) == "function" then
