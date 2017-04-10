@@ -1,9 +1,8 @@
-p(locale)
 local function generateCommandHelp(message)
     local channel = message.channel
     local commandList = {}
     local embed = {
-        title = locale.currentCommand.embedTitle(),
+        title = ":question: "..locale.currentCommand.embedTitle(),
         description = locale.currentCommand.embedDescription(),
         fields = {}
     }
