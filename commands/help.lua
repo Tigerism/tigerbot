@@ -46,9 +46,7 @@ end,
 	--args
 },
 {
-    type = "subcommands",
-    test = function(message)
-        return "test"
-    end
+    type = "subcommands"
+	--subcommands
 }
 
