@@ -79,7 +79,6 @@ function framework:loadModule(path,env)
     env = getNewEnv(env)
     local fn, error = loadstring(code, name, 't', env)
     if not fn then
-    	p(error)
     	return {error=error}
     end
 	return fn
@@ -135,7 +134,6 @@ local function registerModules()
 	framework.modules["logger"] = framework:loadModule(module.dir.."/logger.lua")()
 	framework.modules["pagination"] = framework:loadModule(module.dir.."/pagination.lua")()
 	framework.modules["commands"] = framework:loadModule(module.dir.."/commands.lua")()
-	framework.modules["help"] = framework:loadModule(module.dir.."/help.lua")()
 	client.framework = framework
 end
 
