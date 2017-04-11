@@ -49,6 +49,26 @@ function Command:makeCommand(message,name,path)
 	
 end
 
+local function extractFlags(content)
+	local flags = {}
+	for m,b in string.gmatch(content,"%-%-(%w+)([^%-]*)") do
+		flags[m] = b:trim()
+	end
+	return flags
+end
+
+local function useCommand(command,fn,message)
+	local channel = message.channel
+	local success, msg = pcall(fn,message,command.args)
+	if success then
+		if msg then
+			channel:sendMessage(msg)
+		end
+	else
+		channel:sendMessage(":warning: This command has failed execution!\nError information: ``"..msg.."``")
+	end
+end
+
 local respond = {}
 function respond:embed(...)
 	local embed = {}
@@ -65,7 +85,6 @@ local function checkMatch(prefix,message)
 		for i,v in pairs(Command.commands) do
 			if args[1] and args[1]:lower() == i:lower() then
 				table.remove(args,1)
-				
 				--checks for permissions
 				local command = Command:makeCommand(message,i,v)
 				local isNotAllowed = Command:checkPermissions(message,command)
@@ -75,6 +94,8 @@ local function checkMatch(prefix,message)
 					if true then
 						--another temp thing for something else
 						command.args = args
+						command.flags = extractFlags(table.concat(args," "))
+						command.name = i
 						return command
 					end
 				end
@@ -89,15 +110,24 @@ function Command:newMessage(message)
 	for _,v in pairs(prefixes) do
 		local command = checkMatch(v,message)
 		if command and not command.error then
-			for i,v in pairs(command) do
-				if type(v) == "function" then
-					local success, msg = pcall(v,message,command.args)
-					if success then
-						if msg then
-							channel:sendMessage(msg)
-						end
-					else
-						channel:sendMessage(":warning: This command has failed execution!\nError information: ``"..msg.."``")
+			local help = modules.help(command)
+			local args = command.args
+			if command.flags["help"] then
+				channel:sendMessage({embed={
+					title=command.name,
+					description=help.description,
+					fields = {
+						{name="subcommands",value=(#help.listSubcommands > 0 and table.concat(help.listSubcommands,"\n") or "none"),inline=false}
+					}
+				}})
+				return
+			end
+			if args[1] and help.subcommands[args[1]] then
+				useCommand(command,help.subcommands[args[1]],message)
+			else
+				for i,v in pairs(command) do
+					if type(v) == "function" then
+						useCommand(command,v,message)
 					end
 				end
 			end
