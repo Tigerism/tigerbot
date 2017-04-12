@@ -57,9 +57,9 @@ local function extractFlags(content)
 	return flags
 end
 
-local function useCommand(command,fn,message)
+local function useCommand(command,fn,message,flags)
 	local channel = message.channel
-	local success, msg = pcall(fn,message,command.args)
+	local success, msg = pcall(fn,message,command.args,flags)
 	if success then
 		if msg then
 			channel:sendMessage(msg)
@@ -136,11 +136,11 @@ function Command:newMessage(message)
 				return
 			end
 			if isSubcommand then
-				useCommand(command,help.subcommands[args[1]][2],message)
+				useCommand(command,help.subcommands[args[1]][2],message,command.flags)
 			else
 				for i,v in pairs(command) do
 					if type(v) == "function" then
-						useCommand(command,v,message)
+						useCommand(command,v,message,command.flags)
 					end
 				end
 			end

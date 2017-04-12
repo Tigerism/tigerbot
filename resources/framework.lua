@@ -1,4 +1,4 @@
-local framework = {scripts={},modules={}}
+local framework = {scripts={},modules={paths={}}}
 
 local client
 
@@ -82,6 +82,7 @@ function framework:loadModule(path,env)
     	p(error)
     	return {error=error}
     end
+    framework.modules.paths[name:gsub(".lua","")] = path
 	return fn
 end
 
@@ -112,18 +113,21 @@ function framework:getFiles(path,recursive)
 	return files
 end
 
-local function reloadModule(moduleName)
+function framework:reloadModule(moduleName,run)
+	local path = framework.modules.paths[moduleName]
 	local module = framework.modules[moduleName]
-	if module then
+	if path and module then
 		local fn
 		local success, err = pcall(function()
-			fn = framework:loadModule(module[2])
+			fn = framework:loadModule(path)
 		end)
 		if success then
-			framework.modules[moduleName] = fn
+			framework.modules[moduleName] = run and fn() or fn
 		else
 			return err
 		end
+	else
+		return "unable to find module"
 	end
 end
 
