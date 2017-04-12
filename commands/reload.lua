@@ -4,7 +4,8 @@ return {
     description = "reloads a module"
 },
 {
-	type = "permissions"
+	type = "permissions",
+	ids = {"260157417445130241"}
 },
 function(message,args,flags)
     local moduleName = args[1]
@@ -15,6 +16,8 @@ function(message,args,flags)
         else
            return "Successfully reloaded module ``"..moduleName.."``" 
         end
+    else
+        return "Please specify a module name."
     end
 end
 
