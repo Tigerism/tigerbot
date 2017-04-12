@@ -50,5 +50,10 @@ end,
     test = {"test subcommand",function(message)
         return "test"
     end}
+},
+{
+    type = "flags",
+    test = "does nothing and everything at the same time",
+    
 }
 

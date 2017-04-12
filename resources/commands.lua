@@ -119,7 +119,8 @@ function Command:newMessage(message)
 						title=command.name,
 						description=help.description,
 						fields = {
-							{name="subcommands",value=(#help.listSubcommands > 0 and table.concat(help.listSubcommands,"\n") or "none"),inline=false}
+							{name="subcommands",value=(#help.listSubcommands > 0 and table.concat(help.listSubcommands,"\n") or "none"),inline=false},
+							{name="flags",value=(#help.flags > 0 and table.concat(help.flags,"\n") or "none"),inline=false}
 						}
 					}})
 				else
