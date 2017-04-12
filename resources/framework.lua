@@ -117,14 +117,11 @@ function framework:reloadModule(moduleName,run)
 	local path = framework.modules.paths[moduleName]
 	local module = framework.modules[moduleName]
 	if path and module then
-		local fn
-		local success, err = pcall(function()
-			fn = framework:loadModule(path)
-		end)
-		if success then
+		local fn = framework:loadModule(path)
+		if type(fn) ~= "table" then
 			framework.modules[moduleName] = run and fn() or fn
 		else
-			return err
+			return fn.error
 		end
 	else
 		return "unable to find module"
