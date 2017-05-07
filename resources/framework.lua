@@ -1,12 +1,15 @@
-local framework = {scripts={},modules={paths={}}}
+local framework = {scripts={},modules={paths={Commands={}}}}
 
 local client
+local emitter = require("discordia").Emitter()
+
 
 local fs = require('fs')
 local pathjoin = require('pathjoin')
 local timer = require("timer")
 local http = require("coro-http")
 local firebase = require("luvit-firebase")
+
 
 local splitPath, pathJoin = pathjoin.splitPath, pathjoin.pathJoin
 local readFile, scandir = fs.readFileSync, fs.scandirSync
@@ -22,8 +25,9 @@ local function getNewEnv(extended)
 		framework = framework,
 		module = module,
 		settings = client.settings,
-		locale = framework.modules.locale,
-		db = framework.modules.db
+		--locale = framework.modules.locale,
+		db = framework.modules.db,
+		emitter = emitter
 	}, {__index = _G})
 	if extended and type(extended) == "table" then
 		for i,v in pairs(extended) do
@@ -73,7 +77,7 @@ local function scan(path, name)
     end
 end
 
-function framework:loadModule(path,env)
+function framework:loadModule(path,env,isCommand)
     local code = assert(readFile(path))
     local name = remove(splitPath(path))
     env = getNewEnv(env)
@@ -82,7 +86,11 @@ function framework:loadModule(path,env)
     	p(error)
     	return {error=error}
     end
-    framework.modules.paths[name:gsub(".lua","")] = path
+    if isCommand then
+    	framework.modules.paths.Commands[name:gsub(".lua","")] = path
+    else
+    	framework.modules.paths[name:gsub(".lua","")] = path
+    end
 	return fn
 end
 
@@ -113,13 +121,13 @@ function framework:getFiles(path,recursive)
 	return files
 end
 
-function framework:reloadModule(moduleName,run)
+function framework:reloadModule(moduleName,noRun)
 	local path = framework.modules.paths[moduleName]
 	local module = framework.modules[moduleName]
 	if path and module then
 		local fn = framework:loadModule(path)
 		if type(fn) ~= "table" then
-			framework.modules[moduleName] = run and fn() or fn
+			framework.modules[moduleName] = noRun and fn or fn()
 		else
 			return fn.error
 		end
@@ -137,6 +145,7 @@ local function registerModules()
 	framework.modules["pagination"] = framework:loadModule(module.dir.."/pagination.lua")()
 	framework.modules["commands"] = framework:loadModule(module.dir.."/commands.lua")()
 	framework.modules["help"] = framework:loadModule(module.dir.."/help.lua")()
+	framework.modules["respond"] = framework:loadModule(module.dir.."/respond.lua")()
 	client.framework = framework
 end
 
@@ -147,6 +156,7 @@ local function init(bot,...)
 		framework.scripts[i] = v
 		client[i] = v
 	end
+	
 	registerModules()
 	return framework
 end

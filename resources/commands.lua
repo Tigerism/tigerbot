@@ -37,11 +37,12 @@ function Command:checkPermissions(message,command)
 end
 
 function Command:makeCommand(message,name,path)
-	local locale = locale(db:get("guilds/"..message.guild.id.."/locale"),name)
+	local locale = framework.modules["locale"](db:get("guilds/"..message.guild.id.."/locale"),name)
 	local command = framework:loadModule(path,{
 		locale = locale,
-		command = Command
-	})
+		command = Command,
+		respond = modules.respond(message,emitter)
+	},true)
 	if command then
 		command = {command()}
 		return command

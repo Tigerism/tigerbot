@@ -8,5 +8,11 @@ return {
         embedTitle = "Help for Tiger 2.0",
         embedDescription = "Hello! I'm Tiger, a bot written in Lua with the Discordia library.\nUse the reaction buttons to filter through the command list.\n\nOfficial links: [Discord Server](https://discord.gg/62qYz8J) | [Invite](https://discordapp.com/oauth2/authorize?&client_id=225079733799485441&scope=bot&permissions=8)",
         description = "shows this menu",
+    },
+    reload = {
+        description = "reloads a module",
+        failed = "Module failed to reload: ``{{arg1}}``",
+        success = "Successfully reloaded module ``{{arg1}}``",
+        noname = "Please specify a module name."
     }
 }

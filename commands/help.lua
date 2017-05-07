@@ -2,8 +2,8 @@ local function generateCommandHelp(message)
     local channel = message.channel
     local commandList = {}
     local embed = {
-        title = ":question: "..locale.currentCommand.embedTitle(),
-        description = locale.currentCommand.embedDescription(),
+        title = ":question: "..locale("help.embedTitle"),
+        description = locale("help.embedDescription"),
         fields = {}
     }
     local categories = {}
@@ -32,7 +32,7 @@ end
 
 
 return {
-    description = locale.currentCommand.description()
+    description = locale("help.description")
 },
 {
 	--Permissions
@@ -50,10 +50,5 @@ end,
     test = {"test subcommand",function(message)
         return "test"
     end}
-},
-{
-    type = "flags",
-    test = "does nothing and everything at the same time",
-    
 }
 

@@ -1,7 +1,7 @@
 
 
 return {
-    description = "reloads a module"
+    description = locale("reload.description")
 },
 {
 	type = "permissions",
@@ -10,14 +10,14 @@ return {
 function(message,args,flags)
     local moduleName = args[1]
     if moduleName then
-        local error = framework:reloadModule(moduleName,flags["run"])
+        local error = framework:reloadModule(moduleName,flags["norun"])
         if error then
-            return "Module failed to reload: ``"..error.."``"
+            return locale("reload.failed",error)
         else
-           return "Successfully reloaded module ``"..moduleName.."``" 
+            return locale("reload.success",moduleName)
         end
     else
-        return "Please specify a module name."
+        return locale("reload.noname")
     end
 end
 

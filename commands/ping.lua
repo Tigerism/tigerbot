@@ -1,8 +1,8 @@
 return function(message)
-    local newMsg = message.channel:sendMessage(locale.currentCommand.ping())
-    newMsg:setContent(locale.currentCommand.pong(math.abs(math.floor(((newMsg.createdAt - message.createdAt)*1000)))))
+    local newMsg = message.channel:sendMessage(locale("ping.ping"))
+    newMsg:setContent(locale("ping.pong",(math.abs(math.floor(((newMsg.createdAt - message.createdAt)*1000))))))
 end,
 {
-    description=locale.currentCommand.description(),
+    description=locale("ping.description"),
     category="misc"
 }
