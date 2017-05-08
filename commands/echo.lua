@@ -1,15 +1,19 @@
 
 
 return {
-    description = "echos some text"
+    description = "mainly a testing command"
 },
 function(message,args)
 
-    local arg = respond:args({
+    local args = respond:args({
         {
-            prompt = "What text would you like me to echo?"
-        }   
+            prompt = "Please specify the **member** argument.",
+            type = "member",
+            name = "member"
+        }
     })
+    return args.member.username
+
 end
 
 

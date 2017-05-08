@@ -25,7 +25,6 @@ local function getNewEnv(extended)
 		framework = framework,
 		module = module,
 		settings = client.settings,
-		--locale = framework.modules.locale,
 		db = framework.modules.db,
 		emitter = emitter
 	}, {__index = _G})

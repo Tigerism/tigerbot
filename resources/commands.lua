@@ -70,12 +70,6 @@ local function useCommand(command,fn,message,flags)
 	end
 end
 
-local respond = {}
-function respond:embed(...)
-	local embed = {}
-	--soonTM
-end
-
 local function checkMatch(prefix,message)
 	local content = message.content
 	local channel = message.channel
@@ -108,6 +102,7 @@ end
 function Command:newMessage(message)
 	local content = message.content
 	local channel = message.channel
+	emitter:emit(message.author.id,message)
 	for _,v in pairs(prefixes) do
 		local command = checkMatch(v,message)
 		if command and not command.error then
