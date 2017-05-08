@@ -6,7 +6,7 @@ return function(message,content)
 	local guild = message.guild
 	
 	local id = content:match("<@!?(.*)>") or (tonumber(content) and content:len() > 13 and content)
-	local discrim
+	local discrim , name
 	if not id then
 		name , discrim = content:match("@(.*)#(.*)")
 	end
