@@ -36,6 +36,9 @@ local function isCorrect(message,arg)
     local user = message.mentionedUsers()
     if user then
       return user
+    else
+      local match = framework.modules.resolvers.user[1](message)
+      return match
     end
   end
 end

@@ -12,6 +12,7 @@ function(message,args)
             name = "member"
         }
     })
+    if not args then return end
     return args.member.username
 
 end

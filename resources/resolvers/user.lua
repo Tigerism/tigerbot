@@ -1,19 +1,24 @@
-local User = {}
-local client
+local userCache = {}
 
-local function init(bot)
-	client = bot
-	return User
-end
-
-function User:getMatch(command,myArgs,currentArg,message)
-	--[[local mentions = message.mentions
-	if #mentions > 0 then return mentions[1] end
-	local server = message.server
-	local joined = table.concat(myArgs," ")]]
+return function(message,content)
 	
+	content = content or message.content
+	local guild = message.guild
+	
+	local id = content:match("<@!?(.*)>") or (tonumber(content) and content:len() > 13 and content)
+	local discrim
+	if not id then
+		name , discrim = content:match("@(.*)#(.*)")
+	end
+
+	for member in guild.members do
+		if member.id == id or (member.username == name and member.discriminator == discrim) or member.username == content then
+			return member
+		end
+	end
+	
+	if id then
+		return client:getUser(id)
+	end
 	
 end
-
-
-return init
