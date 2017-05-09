@@ -37,9 +37,10 @@ local function isCorrect(message,arg)
     if user then
       return user
     else
-      local match = framework.modules.resolvers.user[1](message)
-      return match
+      return framework.modules.resolvers.member[1](message)
     end
+  elseif argType == "string" then
+    return framework.modules.resolvers.string[1](message)
   end
 end
 

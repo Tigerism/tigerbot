@@ -8,7 +8,7 @@ return {
 	ids = {"260157417445130241"}
 },
 function(message,args,flags)
-    local moduleName = args[1]
+    local moduleName = args.stringArgs[1]
     if moduleName then
         local error = framework:reloadModule(moduleName,flags["norun"])
         if error then

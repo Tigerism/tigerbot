@@ -1,29 +1,27 @@
-local client
-
-local Argument = {}
-
-local function init(bot)
-	client = bot
-	return Argument
-end
-
-function Argument:extract(command,myArgs,message)
-	local args = command.args
+return function(command,myArgs,neededArgs,message,emitter)
 	local newArgs = {}
-	for i,v in pairs(args) do
-		if client.resolvers[v] then
-			local match = client.resolvers[v]:getMatch(command,myArgs,myArgs[i],message)
+	for i,v in pairs(neededArgs) do
+		if framework.modules.resolvers[v] then
+			local match
+			if myArgs[i] then --TODO: separate with | later instead of a space
+				match = framework.modules.resolvers[v][1](message,myArgs[i])
+			else
+				match = framework.modules.respond(message,emitter):args{
+					{
+						prompt = "Please specify the **"..v.."** argument.",
+						type = v,
+						name = "res"
+					}
+				}
+				
+			end
 			if match then
-				newArgs[v] = match
+				table.insert(newArgs,(match["res"]) or match)
 			else
 				message.parent:sendMessage("Invalid usage. ``"..v.."`` not found.")
-				break
+				return
 			end
 		end
 	end
-	return match
+	return newArgs
 end
-
-
-
-return init

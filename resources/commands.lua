@@ -60,7 +60,11 @@ end
 
 local function useCommand(command,fn,message,flags)
 	local channel = message.channel
-	local success, msg = pcall(fn,message,command.args,flags)
+	local args = {
+		stringArgs = command.args,
+		myArgs = command.myArgs
+	}
+	local success, msg = pcall(fn,message,args,flags)
 	if success then
 		if msg then
 			channel:sendMessage(msg)
@@ -86,9 +90,17 @@ local function checkMatch(prefix,message)
 				if isNotAllowed then
 					channel:sendMessage(":x: Insufficient permissions! ``"..isNotAllowed.."``")
 				else
-					if true then
+					local newArgs , neededArgs
+					for i,v in pairs(command) do
+						if type(v) == "table" and v.args then
+							neededArgs = true
+							newArgs = framework.modules.resolvers["argument"][1](command,client.framework:split(after, " | "),v.args,message,emitter)
+						end
+					end
+					if newArgs or not neededArgs then
 						--another temp thing for something else
 						command.args = args
+						command.myArgs = newArgs
 						command.flags = extractFlags(table.concat(args," "))
 						command.name = i
 						return command
