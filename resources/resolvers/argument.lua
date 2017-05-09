@@ -3,7 +3,7 @@ return function(command,myArgs,neededArgs,message,emitter)
 	for i,v in pairs(neededArgs) do
 		if framework.modules.resolvers[v] then
 			local match
-			if myArgs[i] then --TODO: separate with | later instead of a space
+			if myArgs[i] then
 				match = framework.modules.resolvers[v][1](message,myArgs[i])
 			else
 				match = framework.modules.respond(message,emitter):args{

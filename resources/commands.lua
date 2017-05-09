@@ -8,9 +8,9 @@ function Command:checkPermissions(message,command)
 	--if author.id == "260157417445130241" then return end
 	--local permissions = db:get("guilds/"..guild.id.."/permissions") or {}
 	for i,v in pairs(command) do
-		if type(v) == "table" and v.type == "permissions" then
-			if v.roles then
-				for l,k in pairs(v.roles) do
+		if type(v) == "table" and v.permissions then
+			if v.permissions.roles then
+				for l,k in pairs(v.permissions.roles) do
 					local role = guild:getRole("name",k)
 					if role then
 						if not member:hasRole(role) then
@@ -20,9 +20,9 @@ function Command:checkPermissions(message,command)
 						return "Missing role: "..k
 					end
 				end
-			elseif v.ids then
+			elseif v.permissions.ids then
 				local badId = true
-				for l,k in pairs(v.ids) do
+				for l,k in pairs(v.permissions.ids) do
 					if k == author.id then
 						badId = false
 						break
@@ -81,9 +81,11 @@ local function checkMatch(prefix,message)
 	if beginning == prefix:lower() then
 		local after = content:sub(beginning:len()+1)
 		local args = client.framework:split(after," ")
+		local otherArgs = client.framework:split(table.concat(args," ")," ")
 		for i,v in pairs(Command.commands) do
 			if args[1] and args[1]:lower() == i:lower() then
 				table.remove(args,1)
+				table.remove(otherArgs,1)
 				--checks for permissions
 				local command = Command:makeCommand(message,i,v)
 				local isNotAllowed = Command:checkPermissions(message,command)
@@ -94,11 +96,10 @@ local function checkMatch(prefix,message)
 					for i,v in pairs(command) do
 						if type(v) == "table" and v.args then
 							neededArgs = true
-							newArgs = framework.modules.resolvers["argument"][1](command,client.framework:split(after, " | "),v.args,message,emitter)
+							newArgs = framework.modules.resolvers["argument"][1](command,otherArgs,v.args,message,emitter)
 						end
 					end
 					if newArgs or not neededArgs then
-						--another temp thing for something else
 						command.args = args
 						command.myArgs = newArgs
 						command.flags = extractFlags(table.concat(args," "))

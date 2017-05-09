@@ -1,11 +1,8 @@
-
-
 return {
-    description = locale("reload.description")
-},
-{
-	type = "permissions",
-	ids = {"260157417445130241"}
+    description = locale("reload.description"),
+    permissions = {
+       ids = {"260157417445130241"} 
+    }
 },
 function(message,args,flags)
     local moduleName = args.stringArgs[1]
