@@ -4,13 +4,16 @@ return function(command)
         if type(v) == "table" then
             if v.description or v.fullDescription then
                 info.description = v.description or v.fullDescription or "no description available"
-            elseif v.flags then
+            end
+            info.category = v.category or "misc"
+            if v.flags then
                 for l,k in pairs(v) do
                     if l ~= "type" then
                         table.insert(info.flags,l.." ➜ "..k)
                     end
                 end
-            elseif v.subcommands then
+            end
+            if v.subcommands then
                 for l,k in pairs(v.subcommands) do
                     if type(k) == "table" and type(k[2]) == "function" then
                         info.subcommands[l] = {k[1],k[2]}
@@ -18,7 +21,6 @@ return function(command)
                     end
                 end
             end
-            
         end
     end
     return info

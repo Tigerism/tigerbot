@@ -34,21 +34,6 @@ end
 return {
     description = locale("help.description")
 },
-{
-	--Permissions
-	type = "permissions"
-},
-function(message,args)
+function(message,args,flags)
     generateCommandHelp(message)
-end,
-{
-    type = "args"
-	--args
-},
-{
-    type = "subcommands",
-    test = {"test subcommand",function(message)
-        return "test"
-    end}
-}
-
+end

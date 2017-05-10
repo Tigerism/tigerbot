@@ -32,15 +32,23 @@ end
 
 local function isCorrect(message,arg)
   local argType = arg.type
-  if argType == "member" then
+  if argType == "user" then
     local user = message.mentionedUsers()
     if user then
       return user
     else
-      return framework.modules.resolvers.member[1](message)
+      return framework.modules.resolvers.user[1](message)
     end
   elseif argType == "string" then
     return framework.modules.resolvers.string[1](message)
+  elseif argType == "choice" or argType == "choices" then
+    return framework.modules.resolvers.choice[1](arg,message)
+  elseif argType == "role" then
+    return framework.modules.resolvers.role[1](message,message.guild)
+  elseif argType == "channel" then
+    return framework.modules.resolvers.channel[1](message,message.guild)
+  elseif argType == "command" then
+    return framework.modules.resolvers.command[1](message,arg.node)
   end
 end
 
@@ -50,12 +58,12 @@ function respond:args(args)
   local newArgs = {}
   local co = coroutine.running()
   for i,v in pairs(args) do
-    self.channel:sendMessage(v.prompt)
+    self.channel:sendMessage(v.prompt.."\nSay **cancel** to cancel.")
     self.listener = function(message)
       if message.channel.id ~= self.channel.id then return end
       local content = message.content
       if content:lower():match("cancel") then
-        self.channel:sendMessage("**Cancelled prompt.**")
+        self.channel:sendMessage("**Canceled prompt.**")
         respond.pending[self.author.id] = nil
         deActivate(self)
         return
@@ -66,7 +74,7 @@ function respond:args(args)
         deActivate(self)
         coroutine.resume(co)  
       else
-        self.channel:sendMessage("Incorrect **"..v.type.."** argument. Please try again.")
+        self.channel:sendMessage("Invalid **"..v.type.."** argument. Please try again or say **cancel** to cancel.")
         return
       end
     end

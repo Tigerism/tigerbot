@@ -2,7 +2,7 @@
 
 return {
     description = "bans a member from the server.",
-    args = {{"member","Please specify a member."},{"string","Please state the ban reason."}},
+    args = {{"user","Please specify a user."},{"string","Please state the ban reason."}},
     permissions = {roles = {"Bot Commander"}}
 },
 function(message,args,flags)

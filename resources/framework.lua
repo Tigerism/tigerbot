@@ -25,7 +25,6 @@ local function getNewEnv(extended)
 		framework = framework,
 		module = module,
 		settings = client.settings,
-		db = framework.modules.db,
 		emitter = emitter
 	}, {__index = _G})
 	if extended and type(extended) == "table" then
