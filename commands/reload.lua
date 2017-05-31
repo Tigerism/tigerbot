@@ -3,10 +3,11 @@ return {
     permissions = {
        ids = {"260157417445130241"} 
     },
-    category = "dev"
+    category = "dev",
+    args = {{"string","Please specify the module name."}}
 },
 function(message,args,flags)
-    local moduleName = args.stringArgs[1]
+    local moduleName = args.myArgs[1]
     if moduleName then
         local error = framework:reloadModule(moduleName,flags["norun"])
         if error then
@@ -14,8 +15,6 @@ function(message,args,flags)
         else
             return locale("reload.success",moduleName)
         end
-    else
-        return locale("reload.noname")
     end
 end
 
