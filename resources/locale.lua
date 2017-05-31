@@ -27,12 +27,11 @@ function locale.new(language,name,only)
         local newPath = type(path) == "string" and framework:split(path,"%.") or path
         local findLocale = translations[language] and translations[language][1] or translations["en"][1]
         if findLocale then
-            local command
-            if findLocale[newPath[1]] then
-                command = findLocale[newPath[1]]
+            local command = findLocale[1][newPath[1]]
+            if command then
                 table.remove(newPath,1)
             else
-                command = findLocale[name]
+                command = findLocale[1][name]
             end
             if command then
                 if command[newPath[1]] then

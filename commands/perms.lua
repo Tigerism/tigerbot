@@ -47,13 +47,13 @@ function(message,args,flags)
     if not arg then return end
     newArgs.node = arg.item
     
-    local first,second = framework.modules.permissions:splitFromNode(newArgs.node)
+    local first,second = framework.modules.permissions[1]:splitFromNode(newArgs.node)
     
     local data = {
         [((second ~= "*" and second) or first)] = {allow=newArgs.first == "grant",category=(second and first),all=(second=="*") or nil}
     }
     p(data)
-    local result = framework.modules.db:set("guilds/"..message.guild.id.."/perms/"..newArgs.second.."/"..newArgs.third.id.."/"..newArgs.first,"",data)
+    local result = framework.modules.db[1]:set("guilds/"..message.guild.id.."/perms/"..newArgs.second.."/"..newArgs.third.id.."/"..newArgs.first,"",data)
         
   
     if result then

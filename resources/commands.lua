@@ -9,7 +9,7 @@ function Command:checkPermission(message,command)
 	--if author.id == "260157417445130241" then return end
 	local category = command.help.category
 	
-	local permissions = framework.modules.db:get("guilds/"..guild.id.."/perms") or {}
+	local permissions = framework.modules.db[1]:get("guilds/"..guild.id.."/perms") or {}
 
 	if guild.owner.id ~= author.id then
 		if category ~= "dev" then
@@ -93,11 +93,11 @@ function Command:checkPermission(message,command)
 end
 
 function Command:makeCommand(message,name,path)
-	local locale = framework.modules["locale"](framework.modules.db:get("guilds/"..message.guild.id.."/locale"),name)
+	local locale = framework.modules["locale"][1](framework.modules.db[1]:get("guilds/"..message.guild.id.."/locale"),name)
 	local command = framework:loadModule(path,{
 		locale = locale,
 		command = Command,
-		respond = modules.respond(message,emitter)
+		respond = modules.respond[1](message,emitter)
 	},true)
 	if command then
 		command = {command()}
@@ -144,7 +144,7 @@ local function checkMatch(prefix,message)
 				table.remove(otherArgs,1)
 				local command = Command:makeCommand(message,i,v)
 				command.name = i
-				command.help = modules.help(command)
+				command.help = modules.help[1](command)
 				local check = Command:checkPermission(message,command)
 				
 				if type(check) == "string" then
@@ -154,7 +154,7 @@ local function checkMatch(prefix,message)
 					for i,v in pairs(command) do
 						if type(v) == "table" and v.args then
 							neededArgs = true
-							newArgs = framework.modules.resolvers["argument"][1](command,otherArgs,v.args,message,emitter)
+							newArgs = framework.modules.resolvers["argument"][1][1](command,otherArgs,v.args,message,emitter)
 						end
 					end
 					if newArgs or not neededArgs then
