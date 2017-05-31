@@ -3,3 +3,4 @@ private/
 dependencies.txt
 site/
 deps/
+.DS_Store
