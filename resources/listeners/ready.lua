@@ -5,3 +5,6 @@ local function handleReady()
 end
 
 client:on("ready",handleReady)
+
+
+--framework:wrapHandler("ready",handleReady)
