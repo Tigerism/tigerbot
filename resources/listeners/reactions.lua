@@ -34,7 +34,7 @@ local function reactionAdd(reaction,user)
 					embed.fields = fields
 				end
 			elseif emoji == rightArrow then
-				local fields = modules.pagination:toEmbed(menu.page+1,menu.fields,5)
+				local fields = modules.pagination[1]:toEmbed(menu.page+1,menu.fields,5)
 				if #fields > 0 then
 					menu.page = menu.page + 1
 					embed = {}
@@ -52,6 +52,6 @@ local function reactionAdd(reaction,user)
 	end
 end
 
-client:on("reactionAdd",reactionAdd)
+framework:wrapHandler("reactionAdd",reactionAdd)
 
 return reactions

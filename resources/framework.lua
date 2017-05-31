@@ -1,4 +1,4 @@
-local framework = {scripts={},modules={paths={Commands={}}}}
+local framework = {listeners={},scripts={},modules={paths={Commands={}}}}
 
 local client
 local emitter = require("discordia").Emitter()
@@ -84,12 +84,7 @@ function framework:loadModule(path,env,isCommand)
     	p(error)
     	return {error=error}
     end
-    if isCommand then
-    	framework.modules.paths.Commands[name:gsub(".lua","")] = path
-    else
-    	framework.modules.paths[name:gsub(".lua","")] = path
-    end
-	return fn
+	return (not isCommand and {fn(),path}) or fn
 end
 
 function framework:loadModules(path)
@@ -98,11 +93,15 @@ function framework:loadModules(path)
         if v == 'file' and k:find(".lua") then
         	local fn = framework:loadModule(pathJoin(path, k))
 	        local name = k:gsub(".lua","")
-	        if type(fn) == "table" and fn.error then
-	        	p(fn.error)
-	        else
-	        	fns[name] = {fn(),path}
-	        end
+	        if type(fn) == "table" then
+	        	if fn.error then
+	        		p(fn.error)
+	        	else
+	        		fns[name] = {fn,path}	
+	        	end
+    		else
+        		fns[name] = {fn(),path}
+ 	       end
         end
     end
     return fns
@@ -120,12 +119,11 @@ function framework:getFiles(path,recursive)
 end
 
 function framework:reloadModule(moduleName,noRun)
-	local path = framework.modules.paths[moduleName]
-	local module = framework.modules[moduleName]
-	if path and module then
-		local fn = framework:loadModule(path)
+	local module = framework.modules[moduleName] or framework.listeners[moduleName]
+	if module then
+		local fn = framework:loadModule(module[2])
 		if type(fn) ~= "table" then
-			framework.modules[moduleName] = noRun and fn or fn()
+			framework.modules[moduleName] = {(noRun and fn or fn()),module[2]}
 		else
 			return fn.error
 		end
@@ -135,17 +133,26 @@ function framework:reloadModule(moduleName,noRun)
 end
 
 local function registerModules()
-	framework.modules["locale"] = framework:loadModule(module.dir.."/locale.lua")()
-	framework.modules["db"] = framework:loadModule(module.dir.."/db.lua")()
+	framework.modules["locale"] = framework:loadModule(module.dir.."/locale.lua")
+	framework.modules["db"] = framework:loadModule(module.dir.."/db.lua")
 	framework.modules["listeners"] = framework:loadModules(module.dir.."/listeners/")
 	framework.modules["resolvers"] = framework:loadModules(module.dir.."/resolvers/")
-	framework.modules["logger"] = framework:loadModule(module.dir.."/logger.lua")()
-	framework.modules["pagination"] = framework:loadModule(module.dir.."/pagination.lua")()
-	framework.modules["commands"] = framework:loadModule(module.dir.."/commands.lua")()
-	framework.modules["help"] = framework:loadModule(module.dir.."/help.lua")()
-	framework.modules["respond"] = framework:loadModule(module.dir.."/respond.lua")()
-	framework.modules["permissions"] = framework:loadModule(module.dir.."/permissions.lua")()
+	framework.modules["logger"] = framework:loadModule(module.dir.."/logger.lua")
+	framework.modules["pagination"] = framework:loadModule(module.dir.."/pagination.lua")
+	framework.modules["commands"] = framework:loadModule(module.dir.."/commands.lua")
+	framework.modules["help"] = framework:loadModule(module.dir.."/help.lua")
+	framework.modules["respond"] = framework:loadModule(module.dir.."/respond.lua")
+	framework.modules["permissions"] = framework:loadModule(module.dir.."/permissions.lua")
 	client.framework = framework
+end
+
+function framework:wrapHandler(name,fn)
+	local path = module.dir.."/listeners/"..name..".lua"
+	if framework.listeners[name] then
+		client:removeListener(name,framework.listeners[name][1])
+	end
+	framework.listeners[name] = {fn,path}
+	client:on(name,fn)
 end
 
 local function init(bot,...)
@@ -159,5 +166,7 @@ local function init(bot,...)
 	registerModules()
 	return framework
 end
+
+
 
 return init
