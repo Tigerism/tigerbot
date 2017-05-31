@@ -1,30 +1,61 @@
 local Command = {commands=framework:getFiles(module.dir.."/../commands/")}
 local prefixes = settings.prefixes
 
-function Command:checkPermissions(message,command)
+function Command:checkPermission(message,command)
 	local member = message.member
 	local author = message.author
 	local guild = message.guild
 	local channel = message.channel
 	--if author.id == "260157417445130241" then return end
 	local category = command.help.category
-	local permissions = framework.modules.db:get("guilds/"..guild.id.."/perms") or {deny={user={},channel={},role={}},allow={user={},channel={},role={}}}
+	
+	local permissions = framework.modules.db:get("guilds/"..guild.id.."/perms") or {}
+
 	if guild.owner.id ~= author.id then
-		if permissions.channel then
-			if permissions.channel[channel.id] then
-				return permissions.channel[channel.id][command.name] == false or permissions.channel[channel.id][category] == false and "Permission settings restrict this channel from using this command."
-			end
-		elseif permissions.role then
-			for role in member.roles do
-				if permissions.role[role.id] then
-					return not permissions.role[role.id][command.name] == false or permissions.role[role.id][category] == false and "Permission settings restrict your role from using this command."
+		if permissions.user then
+			if permissions.user[author.id] then
+				if permissions.user[author.id].deny then
+					if permissions.user[author.id].deny[category] or permissions.user[author.id].deny[command.name] then
+						return "User permissions restrict you from using this command."
+					end
+				end
+				if permissions.user[author.id].grant then
+					if permissions.user[author.id].grant[category] or permissions.user[author.id].grant[command.name] then
+						return true
+					end
 				end
 			end
-		elseif permissions.user then
-			if permissions.user[author.id] then
-				return not permissions.user[author.id][command.name] == false or permissions.user[user.id][category] == false  and "Permission settings restrict you from using this command."
+		end	
+		if permissions.channel then
+			if permissions.channel[channel.id] then
+				if permissions.channel[channel.id].deny then
+					if permissions.channel[channel.id].deny[category] or permissions.channel[channel.id].deny[command.name] then
+						return "Channel permissions restrict you from using this command."
+					end
+				end
+				if permissions.channel[channel.id].grant then
+					if permissions.channel[channel.id].grant[category] or permissions.channel[channel.id].grant[command.name] then
+						return true
+					end
+				end
 			end
 		end
+		if permissions.role then
+			for role in member.roles do
+				if permissions.role[role.id] then
+					if permissions.role[role.id].deny then
+						if permissions.role[role.id].deny[category] or permissions.role[role.id].deny[command.name] then
+							return "Role permissions restrict you from using this command."
+						end
+					end
+					if permissions.role[role.id].grant then
+						if permissions.role[role.id].grant[category] or permissions.role[role.id].grant[command.name] then
+							return true
+						end
+					end
+				end
+			end
+		end	
 	end
 	for i,v in pairs(command) do
 		if type(v) == "table" and v.permissions then
@@ -112,9 +143,10 @@ local function checkMatch(prefix,message)
 				local command = Command:makeCommand(message,i,v)
 				command.name = i
 				command.help = modules.help(command)
-				local isNotAllowed = Command:checkPermissions(message,command)
-				if isNotAllowed then
-					channel:sendMessage(":x: Insufficient permissions! ``"..isNotAllowed.."``")
+				local check = Command:checkPermission(message,command)
+				
+				if type(check) == "string" then
+					channel:sendMessage(":x: Insufficient permissions! ``"..check.."``")
 				else
 					local newArgs , neededArgs
 					for i,v in pairs(command) do

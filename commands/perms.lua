@@ -2,7 +2,8 @@ return {
     permissions = {
         serverOwnerOnly = true
         
-    }
+    },
+    category = "admin"
 },
 function(message,args,flags)
     local newArgs = {}
@@ -37,23 +38,27 @@ function(message,args,flags)
     newArgs.third = arg.item
     arg = respond:args {
         {
-          prompt = "Please specify a **command** or a **category** that you would like to **"..newArgs.first.."** this permission to. ",
-          type = "command",
+          prompt = "Please specify the **command node** that you would like to **"..newArgs.first.."** this permission to.\nExamples: mod.ban, misc.ping, ping ",
+          type = "string",
           name = "item",
           node = true
         }
     }
     if not arg then return end
-    newArgs.command = arg.item
+    newArgs.node = arg.item
+    
+    local first,second = framework.modules.permissions:splitFromNode(newArgs.node)
     
     local data = {
-        [newArgs.command] = newArgs.first == "grant"
+        [((second ~= "*" and second) or first)] = {allow=newArgs.first == "grant",category=(second and first),all=(second=="*") or nil}
     }
-
-    local result = framework.modules.db:set("guilds/"..message.guild.id.."/perms/"..newArgs.second.."/"..newArgs.third.id.."/","",data)
+    p(data)
+    local result = framework.modules.db:set("guilds/"..message.guild.id.."/perms/"..newArgs.second.."/"..newArgs.third.id.."/"..newArgs.first,"",data)
+        
+  
     if result then
-        respond:success("Successfully **saved** your permission configuration.")
+        respond:success("Successfully saved the **"..newArgs.second.."** permission.")
     else
-        respond:error("Failed to save your permission configuration.")
+        respond:error("Failed to **"..newArgs.first.."** the permission to the **"..newArgs.second.."**.")
     end
 end
