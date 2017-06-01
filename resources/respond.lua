@@ -19,11 +19,11 @@ function respond:embed(...)
 end
 
 function respond:success(text)
-  self.channel:sendMessage(":ok_hand: "..text)
+  return self.channel:sendMessage(":ok_hand: "..text)
 end
 
 function respond:error(text)
-  self.channel:sendMessage(":frowning: "..text)
+  return self.channel:sendMessage(":frowning: "..text)
 end
 
 local function deActivate(self)
@@ -41,6 +41,8 @@ local function isCorrect(message,arg)
     end
   elseif argType == "string" then
     return framework.modules.resolvers.string[1][1](message)
+  elseif argType == "number" then
+    return framework.modules.resolvers.number[1][1](message)
   elseif argType == "choice" or argType == "choices" then
     return framework.modules.resolvers.choice[1][1](arg,message)
   elseif argType == "role" then
