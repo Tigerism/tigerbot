@@ -16,7 +16,8 @@ return function(command,myArgs,neededArgs,message,emitter)
 				
 			end
 			if match then
-				table.insert(newArgs,(match["res"]) or match)
+				match = (type(match) ~= "string" and type(match) ~= "number" and match["res"]) or match
+				table.insert(newArgs,match)
 			else
 				message.parent:sendMessage("Invalid usage: ``"..v[1].."`` not found.")
 				return
