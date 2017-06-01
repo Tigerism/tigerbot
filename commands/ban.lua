@@ -1,5 +1,3 @@
-
-
 return {
     description = "bans a member from the server.",
     args = {{"user","Please specify a user."},{"string","Please state the ban reason."}},
@@ -7,11 +5,11 @@ return {
     category = "mod"
 },
 function(message,args,flags)
-    local member = args.myArgs[1]
-    local result = member:ban(7)
+    local user = args.myArgs[1]
+    local result = message.guild:banUser(user,7)
     if result then
-        respond:success("Successfully banned **"..member.username.."**")
+        respond:success("Successfully banned **"..user.username.."**")
     else
-        respond:error("Failed to ban **"..member.username.."**")
+        respond:error("Failed to ban **"..user.username.."**")
     end
 end
