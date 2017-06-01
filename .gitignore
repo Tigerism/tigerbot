@@ -4,3 +4,4 @@ dependencies.txt
 site/
 deps/
 .DS_Store
+launcher.lua
