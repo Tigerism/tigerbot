@@ -81,11 +81,11 @@ function Command:checkPermission(message,command)
 					end
 				end
 				if badId then
-					return "Restricted command."
+					return "This command is restricted only to whitelisted IDs."
 				end
 			elseif v.permissions.serverOwnerOnly then
 				if guild.owner.id ~= author.id then
-					return "Restricted command only to the server owner."
+					return "Command restricted to the server owner."
 				end
 			end
 		end
@@ -97,7 +97,8 @@ function Command:makeCommand(message,name,path)
 	local command = framework:loadModule(path,{
 		locale = locale,
 		command = Command,
-		respond = modules.respond[1](message,emitter)
+		respond = modules.respond[1](message,emitter),
+		sleep = require("timer").sleep
 	},true)
 	if command then
 		command = {command()}
@@ -144,7 +145,40 @@ local function checkMatch(prefix,message)
 				table.remove(otherArgs,1)
 				local command = Command:makeCommand(message,i,v)
 				command.name = i
+				command.flags = extractFlags(table.concat(args," "))
 				command.help = modules.help[1](command)
+				
+				local help = command.help
+				
+				-- --help flag
+				local isSubcommand = args[1] and help.subcommands[args[1]]
+				command.isSubcommand = isSubcommand
+				
+				if command.flags["help"] then
+					if not isSubcommand then
+						channel:sendMessage({embed={
+							title=command.name,
+							description=help.description,
+							fields = {
+								{name="category",value=help.category,inline=false},
+								{name="subcommands",value=(#help.listSubcommands > 0 and table.concat(help.listSubcommands,"\n") or "none"),inline=false},
+								{name="flags",value=(#help.flags > 0 and table.concat(help.flags,"\n") or "none"),inline=false}
+							}
+						}})
+					else
+						channel:sendMessage({embed={
+							title=args[1],
+							description=isSubcommand[1] or "no description available",
+							fields = {
+								{name="parent command",value=command.name,inline=false}
+							}
+						}})
+					end
+					
+					return	
+				end
+				
+				
 				local check = Command:checkPermission(message,command)
 				
 				if type(check) == "string" then
@@ -160,7 +194,6 @@ local function checkMatch(prefix,message)
 					if newArgs or not neededArgs then
 						command.args = args
 						command.myArgs = newArgs
-						command.flags = extractFlags(table.concat(args," "))
 						return command
 					end
 				end
@@ -178,29 +211,7 @@ function Command:newMessage(message)
 		if command and not command.error then
 			local help = command.help
 			local args = command.args
-			local isSubcommand = args[1] and help.subcommands[args[1]]
-			if command.flags["help"] then
-				if not isSubcommand then
-					channel:sendMessage({embed={
-						title=command.name,
-						description=help.description,
-						fields = {
-							{name="subcommands",value=(#help.listSubcommands > 0 and table.concat(help.listSubcommands,"\n") or "none"),inline=false},
-							{name="flags",value=(#help.flags > 0 and table.concat(help.flags,"\n") or "none"),inline=false}
-						}
-					}})
-				else
-					channel:sendMessage({embed={
-						title=args[1],
-						description=isSubcommand[1] or "no description available",
-						fields = {
-							{name="parent command",value=command.name,inline=false}
-						}
-					}})
-				end
-				
-				return
-			end
+			local isSubcommand = command.isSubcommand
 			if isSubcommand then
 				useCommand(command,help.subcommands[args[1]][2],message,command.flags)
 			else
