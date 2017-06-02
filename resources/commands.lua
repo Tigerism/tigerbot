@@ -138,19 +138,17 @@ local function checkMatch(prefix,message)
 	if beginning == prefix:lower() then
 		local after = content:sub(beginning:len()+1)
 		local args = client.framework:split(after," ")
-		local otherArgs = client.framework:split(table.concat(args," ")," ")
 		for i,v in pairs(Command.commands) do
 			if args[1] and args[1]:lower() == i:lower() then
 				table.remove(args,1)
-				table.remove(otherArgs,1)
+				local otherArgs = client.framework:split(table.concat(args," ")," | ")
 				local command = Command:makeCommand(message,i,v)
 				command.name = i
 				command.flags = extractFlags(table.concat(args," "))
 				command.help = modules.help[1](command)
 				
 				local help = command.help
-				
-				-- --help flag
+			
 				local isSubcommand = args[1] and help.subcommands[args[1]]
 				command.isSubcommand = isSubcommand
 				

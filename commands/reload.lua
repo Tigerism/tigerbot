@@ -8,13 +8,11 @@ return {
 },
 function(message,args,flags)
     local moduleName = args.myArgs[1]
-    if moduleName then
-        local error = framework:reloadModule(moduleName,flags["norun"])
-        if error then
-            return locale("reload.failed",error)
-        else
-            return locale("reload.success",moduleName)
-        end
+    local error = framework:reloadModule(moduleName,flags["norun"])
+    if error then
+        return locale("reload.failed",error)
+    else
+        return locale("reload.success",moduleName)
     end
 end
 
