@@ -21,4 +21,8 @@ function db:set(node,saveAs,saveData)
     return true
 end
 
+function db:delete(node)
+    local error, data = firebase:delete(node)
+end
+
 return db

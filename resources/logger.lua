@@ -18,12 +18,32 @@ function logger:sendLog(title,description,color)
 	http.request("POST",webhook,{{"Content-Type","application/json"}},json.encode(post))	
 end
 
-function logger:newModLog(guild,offender,options)
+function logger:newModLog(guild,user,options)
+	options = options or {}
 	options.timestamp = os.time()
-	local logNumber = framework.modules.db[1]:get("guilds/"..guild.."/logs/"..offender.."/logNumber") or 0
+	if options.duration then
+		if options.duration ~= "none" then
+			--timed action
+			options.expiresOn = os.time() + options.duration
+			options.duration = nil
+			framework.modules.timedActions[1](true,guild.id,user.id,options)
+			framework.modules.db[1]:set("pendingActions/"..guild.id.."/"..user.id.."/","user",options)
+		else
+			if options.type == "Ban" then
+			--permanent action
+				options.duration = nil	
+			end
+			
+		end
+	else
+		if options.type == "Unban" or options.type == "Unmute" then
+			framework.modules.timedActions[1](false,guild.id,user.id,options)	
+		end
+	end
+	local logNumber = framework.modules.db[1]:get("guilds/"..guild.id.."/logs/"..user.id.."/logNumber") or 0
 	logNumber = logNumber + 1
-	framework.modules.db[1]:set("guilds/"..guild.."/logs/"..offender.."/","logNumber",{logNumber = logNumber})
-	framework.modules.db[1]:set("guilds/"..guild.."/logs/"..offender.."/"..logNumber,"logs",options)
+	framework.modules.db[1]:set("guilds/"..guild.id.."/logs/"..user.id.."/","logNumber",{logNumber = logNumber})
+	framework.modules.db[1]:set("guilds/"..guild.id.."/logs/"..user.id.."/"..logNumber,"logs",options)
 end
 
 

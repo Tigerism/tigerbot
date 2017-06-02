@@ -143,6 +143,7 @@ local function registerModules()
 	framework.modules["help"] = framework:loadModule(module.dir.."/help.lua")
 	framework.modules["respond"] = framework:loadModule(module.dir.."/respond.lua")
 	framework.modules["permissions"] = framework:loadModule(module.dir.."/permissions.lua")
+	framework.modules["timedActions"] = framework:loadModule(module.dir.."/timedActions.lua")
 	client.framework = framework
 end
 
