@@ -1,4 +1,6 @@
-return function(arg,message,content)
+local choice = {}
+
+function choice:resolve(arg,message,content)
 	content = content or message.content
 	content = content:lower()
 	
@@ -9,3 +11,5 @@ return function(arg,message,content)
 	end
 	
 end
+
+return choice

@@ -10,7 +10,7 @@ function(message,args,flags)
     local result = guild:kickUser(user)
     if result then
         respond:success("Successfully kicked **"..user.username.."**")
-        modules.logger[1]:newModLog(guild.id,user.id,{
+        modules.logger[1]:newModLog(guild,user,{
             type = "Kick",
             reason = args.myArgs[2],
             mod = message.author.id

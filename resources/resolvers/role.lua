@@ -1,4 +1,6 @@
-return function(message,guild)
+local role = {}
+
+function role:resolve(message,guild)
 	local content = message.content or message
 	
 	local id = content:match("<@&(.*)>") or (tonumber(content) and content:len() > 16 and content)
@@ -9,3 +11,5 @@ return function(message,guild)
 		end
 	end
 end
+
+return role

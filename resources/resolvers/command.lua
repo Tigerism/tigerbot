@@ -1,4 +1,6 @@
-return function(message,allowsNode)
+local command = {}
+
+function command:resolve(message,allowsNode)
 	local content = message.content or message
 	content = content:lower()
 	
@@ -20,3 +22,5 @@ return function(message,allowsNode)
 	end
 	
 end
+
+return command

@@ -21,7 +21,7 @@ function(message,args,flags)
     for i,v in pairs(sortedLogs) do
         local mod = client:getUser(v.mod)
         if mod then
-            local timestamp = modules.resolvers.time[1][1]:toHumanTime(os.time()-v.timestamp,false).." ago"
+            local timestamp = modules.resolvers.duration[1][1]:toHumanTime(os.time()-v.timestamp,true).." ago"
             table.insert(fields,{name=v.type,value="**Reason:** "..v.reason.."\n**Issued:** "..timestamp.."\n**Moderator:** "..mod.username.."#"..mod.discriminator})
         end
     end

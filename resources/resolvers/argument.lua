@@ -4,7 +4,7 @@ return function(command,myArgs,neededArgs,message,emitter)
 		if framework.modules.resolvers[v[1]] then
 			local match
 			if myArgs[i] then
-				match = framework.modules.resolvers[v[1]][1][1](message,myArgs[i])
+				match = framework.modules.resolvers[v[1]][1][1]:resolve(message,myArgs[i])
 			else
 				match = framework.modules.respond[1](message,emitter):args{
 					{

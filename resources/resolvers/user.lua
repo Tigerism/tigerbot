@@ -1,6 +1,8 @@
 local userCache = {}
 
-return function(message,content)
+local userResolver = {}
+
+function userResolver:resolve(message,content)
 	content = content or message.content
 	local guild = message.guild
 	
@@ -18,3 +20,5 @@ return function(message,content)
 		return client:getUser(id)
 	end
 end
+
+return userResolver
