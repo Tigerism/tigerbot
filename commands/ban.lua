@@ -6,9 +6,15 @@ return {
 },
 function(message,args,flags)
     local user = args.myArgs[1]
-    local result = message.guild:banUser(user,7)
+    local guild = message.guild
+    local result = guild:banUser(user,7)
     if result then
         respond:success("Successfully banned **"..user.username.."**")
+        modules.logger[1]:newModLog(guild.id,user.id,{
+            type = "Ban",
+            reason = args.myArgs[2],
+            mod = message.author.id
+        })
     else
         respond:error("Failed to ban **"..user.username.."**")
     end
