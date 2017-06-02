@@ -7,7 +7,6 @@ local clock = discordia.Clock()
 clock:on("min",function()
 	for i,v in pairs(pendingActions) do
 		for l,k in pairs(v) do
-			print("something is there")
 			if os.time() >= k.expiresOn then
 				if k.type == "Ban" then
 					local guild = client:getGuild(k.guild)
