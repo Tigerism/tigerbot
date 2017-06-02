@@ -6,6 +6,7 @@ function db:get(node)
     --if db.cache[node] then return db.cache[node] end
     local error, data = firebase:get(node)
     --db.cache[node] = data
+    if error then p("firebase:",error) end
     return not error and data
 end
 
