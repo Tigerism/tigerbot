@@ -10,54 +10,53 @@ function Command:checkPermission(message,command)
 	local category = command.help.category
 	
 	local permissions = framework.modules.db[1]:get("guilds/"..guild.id.."/perms") or {}
+	
 
-	if guild.owner.id ~= author.id then
-		if category ~= "dev" then
-			if permissions.user then
-				if permissions.user[author.id] then
-					if permissions.user[author.id].deny then
-						if permissions.user[author.id].deny[category] or permissions.user[author.id].deny[command.name] then
-							return "User permissions restrict you from using this command."
-						end
-					end
-					if permissions.user[author.id].grant then
-						if permissions.user[author.id].grant[category] or permissions.user[author.id].grant[command.name] then
-							return true
-						end
+	if category ~= "dev" then
+		if permissions.user then
+			if permissions.user[author.id] then
+				if permissions.user[author.id].deny and guild.owner.id ~= author.id then
+					if permissions.user[author.id].deny[category] or permissions.user[author.id].deny[command.name] or (permissions.user[author.id].deny[category] and permissions.user[author.id].deny[category].all) then
+						return "User permissions restrict you from using this command."
 					end
 				end
-			end	
-			if permissions.channel then
-				if permissions.channel[channel.id] then
-					if permissions.channel[channel.id].deny then
-						if permissions.channel[channel.id].deny[category] or permissions.channel[channel.id].deny[command.name] then
-							return "Channel permissions restrict you from using this command."
+				if permissions.user[author.id].grant then
+					if permissions.user[author.id].grant[category] or permissions.user[author.id].grant[command.name] or (permissions.user[author.id].grant[category] and permissions.user[author.id].grant[category].all) then
+						return true
+					end
+				end
+			end
+		end	
+		if permissions.channel then
+			if permissions.channel[channel.id] then
+				if permissions.channel[channel.id].deny and guild.owner.id ~= author.id then
+					if permissions.channel[channel.id].deny[category] or permissions.channel[channel.id].deny[command.name] or (permissions.channel[channel.id].deny[category] and permissions.channel[channel.id].deny[category].all) then
+						return "Channel permissions restrict you from using this command."
+					end
+				end
+				if permissions.channel[channel.id].grant then
+					if permissions.channel[channel.id].grant[category] or permissions.channel[channel.id].grant[command.name] or (permissions.channel[channel.id].grant[category] and permissions.channel[channel.id].grant[category].all) then
+						return true
+					end
+				end
+			end
+		end
+		if permissions.role then
+			for role in member.roles do
+				if permissions.role[role.id] then
+					if permissions.role[role.id].deny and guild.owner.id ~= author.id then
+						if permissions.role[role.id].deny[category] or permissions.role[role.id].deny[command.name] or (permissions.role[role.id].deny[category] and permissions.role[role.id].deny[category].all) then
+							return "Role permissions restrict you from using this command."
 						end
 					end
-					if permissions.channel[channel.id].grant then
-						if permissions.channel[channel.id].grant[category] or permissions.channel[channel.id].grant[command.name] then
+					if permissions.role[role.id].grant then
+						if permissions.role[role.id].grant[category] or permissions.role[role.id].grant[command.name] or (permissions.role[role.id].grant[category] and permissions.role[role.id].grant[category].all) then
 							return true
 						end
 					end
 				end
 			end
-			if permissions.role then
-				for role in member.roles do
-					if permissions.role[role.id] then
-						if permissions.role[role.id].deny then
-							if permissions.role[role.id].deny[category] or permissions.role[role.id].deny[command.name] then
-								return "Role permissions restrict you from using this command."
-							end
-						end
-						if permissions.role[role.id].grant then
-							if permissions.role[role.id].grant[category] or permissions.role[role.id].grant[command.name] then
-								return true
-							end
-						end
-					end
-				end
-			end	
-		end
+		end	
 	end
 	for i,v in pairs(command) do
 		if type(v) == "table" and v.permissions then

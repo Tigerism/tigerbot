@@ -24,6 +24,9 @@ end)
 clock:start()
 
 function actions.new(toAdd,guild,user,options)
+	if not guild then return end
+	if not user then return end
+	if not options then return end
 	if toAdd then
 		if not pendingActions[guild] then
 			pendingActions[guild] = {}

@@ -3,9 +3,9 @@ return function(command)
     for i,v in pairs(command) do
         if type(v) == "table" then
             if v.description or v.fullDescription then
-                info.description = v.description or v.fullDescription or "no description available"
+                info.description = info.description or (v.description or v.fullDescription or "no description available")
             end
-            info.category = v.category or "misc"
+            info.category = info.category or (v.category or "misc")
             if v.flags then
                 for l,k in pairs(v) do
                     if l ~= "type" then
