@@ -22,7 +22,19 @@ function(message,args,flags)
         local mod = client:getUser(v.mod)
         if mod then
             local timestamp = modules.resolvers.duration[1][1]:toHumanTime(os.time()-v.timestamp,true).." ago"
-            table.insert(fields,{name=v.type,value="**Reason:** "..v.reason.."\n**Issued:** "..timestamp.."\n**Moderator:** "..mod.username.."#"..mod.discriminator})
+            local value = "**Reason:** "..v.reason.."\n**Issued:** "..timestamp.."\n"
+            if v.expiresOn then
+                local time = v.expiresOn-os.time()
+                local convert = modules.resolvers.duration[1][1]:toHumanTime(math.abs(time),true)
+                if time < 0 then
+                    --expired
+                    value = value.."**Expiry:** "..convert.." ago\n"
+                else
+                    value = value.."**Expiry:** in "..convert.."\n"
+                end
+            end
+            value = value.."**Moderator:** "..mod.username.."#"..mod.discriminator
+            table.insert(fields,{name=v.type,value=value})
         end
     end
     
@@ -39,7 +51,6 @@ function(message,args,flags)
         startingPage = 1,
         infoPage = {title="Tiger Moderation Logs",fields = {
             {name="FAQ",value="**Q1.) What's this?**\nAny moderation action you take with Tiger gets logged. This command allows you to view the moderation logs of a user with actions taken by Tiger.\n\n**Q2.) What actions get logged?**\nAny moderation taken by Tiger, such as a ban, kick, softban, mute, etc.",inline=false}
-
         }}
     })
 end
