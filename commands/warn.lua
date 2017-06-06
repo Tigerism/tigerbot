@@ -1,5 +1,5 @@
 return {
-    description = "warns a member.",
+    description = "warn a member.",
     args = {{"user","Please specify a user."},{"string","Please state the reason."}},
     permissions = {roles = {"Bot Commander"}},
     category = "mod"

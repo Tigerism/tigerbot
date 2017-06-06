@@ -1,5 +1,5 @@
 return {
-    description = "bans a member from the server.",
+    description = "ban a member from the server.",
     args = {{"user","Please specify a user."},{"string","Please state the ban reason."},{"duration","Please state the ban duration.\nSay **none** if the action is permanent."}},
     permissions = {roles = {"Bot Commander"}},
     category = "mod"

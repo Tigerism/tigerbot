@@ -38,7 +38,7 @@ function(message,args,flags)
     newArgs.third = arg.item
     arg = respond:args {
         {
-          prompt = "Please specify the **command node** that you would like to **"..newArgs.first.."** this permission to.\nExamples: mod.ban, misc.ping, ping ",
+          prompt = "Please specify the **command node** that you would like to **"..newArgs.first.."** this permission to. Use * to represent all of a category. You can find the category name if you do ``tiger [command] --help``. The node should follow this format: ``category.commandName`` or ``category.*``\nExamples: mod.ban, misc.ping, mod.* ",
           type = "string",
           name = "item",
           node = true
@@ -52,7 +52,6 @@ function(message,args,flags)
     local data = {
         [((second ~= "*" and second) or first)] = {allow=newArgs.first == "grant",category=(second and first),all=(second=="*") or nil}
     }
-    p(data)
     local result = framework.modules.db[1]:set("guilds/"..message.guild.id.."/perms/"..newArgs.second.."/"..newArgs.third.id.."/"..newArgs.first,"",data)
         
   

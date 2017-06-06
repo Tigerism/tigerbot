@@ -1,5 +1,5 @@
 return {
-    description = "softbans (ban and unban) a member from the server.",
+    description = "softban (ban and unban) a member from the server.",
     args = {{"user","Please specify a user."},{"string","Please state the softban reason."}},
     permissions = {roles = {"Bot Commander"}},
     category = "mod"

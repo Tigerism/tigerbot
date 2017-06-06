@@ -1,5 +1,5 @@
 return {
-    description = "kicks a member from the server.",
+    description = "kick a member from the server.",
     args = {{"user","Please specify a user."},{"string","Please state the kick reason."}},
     permissions = {roles = {"Bot Commander"}},
     category = "mod"

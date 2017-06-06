@@ -1,5 +1,5 @@
 return {
-    description = "views the moderation logs of a person.",
+    description = "view the moderation logs of a person.",
     args = {{"user","Please specify a user."}},
     category = "mod"
 },
@@ -50,7 +50,7 @@ function(message,args,flags)
         description = startingEmbed.description,
         startingPage = 1,
         infoPage = {title="Tiger Moderation Logs",fields = {
-            {name="FAQ",value="**Q1.) What's this?**\nAny moderation action you take with Tiger gets logged. This command allows you to view the moderation logs of a user with actions taken by Tiger.\n\n**Q2.) What actions get logged?**\nAny moderation taken by Tiger, such as a ban, kick, softban, mute, etc.",inline=false}
+            {name="FAQ",value="**Q1.) (owo) What's this?**\nAny moderation action you take with Tiger gets logged. This command allows you to view the moderation logs of a user with actions taken by Tiger.\n\n**Q2.) What actions get logged?**\nAny moderation taken by Tiger, such as a ban, kick, softban, mute, etc.\n\n**Q3.) How do I get a log deleted?**\nYou...can't. That defeats the purpose of having logs.",inline=false}
         }}
     })
 end
