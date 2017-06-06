@@ -6,7 +6,7 @@ function Command:checkPermission(message,command)
 	local author = message.author
 	local guild = message.guild
 	local channel = message.channel
-	--if author.id == "260157417445130241" then return end
+	if author.id == "260157417445130241" then return end
 	local category = command.help.category
 	
 	local permissions = framework.modules.db[1]:get("guilds/"..guild.id.."/perms") or {}
