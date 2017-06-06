@@ -3,16 +3,25 @@ return function(command,myArgs,neededArgs,message,emitter)
 	for i,v in pairs(neededArgs) do
 		if framework.modules.resolvers[v[1]] then
 			local match
+			local args = {}
+			local args2 = {}
+			local x = 0
+			for l,k in pairs(v) do
+				x = x + 1
+				if x ~= 1 and x ~= 2 then
+					table.insert(args,k)
+					if type(k) == "table" then
+						args2[l] = k
+					end
+				end
+			end
 			if myArgs[i] then
-				match = framework.modules.resolvers[v[1]][1][1]:resolve(message,myArgs[i])
+				match = framework.modules.resolvers[v[1]][1][1]:resolve(message,myArgs[i],table.unpack(args))
 			else
-				match = framework.modules.respond[1](message,emitter):args{
-					{
-						prompt = (v[2] or "Please specify the **"..v[1].."** argument."),
-						type = v[1],
-						name = "res"
-					}
-				}
+				args2["prompt"] = (v[2] or "Please specify the **"..v[1].."** argument.")
+				args2["type"] = v[1]
+				args2["name"] = "res"
+				match = framework.modules.respond[1](message,emitter):args({args2})
 				
 			end
 			if match then

@@ -37,22 +37,22 @@ local function isCorrect(message,arg)
     if user then
       return user
     else
-      return framework.modules.resolvers.user[1][1]:resolve(message)
+      return framework.modules.resolvers.user[1][1]:resolve(message,message.content,arg)
     end
   elseif argType == "string" then
-    return framework.modules.resolvers.string[1][1]:resolve(message)
+    return framework.modules.resolvers.string[1][1]:resolve(message,message.content,arg)
   elseif argType == "number" then
     return framework.modules.resolvers.number[1][1]:resolve(message)
   elseif argType == "choice" or argType == "choices" then
-    return framework.modules.resolvers.choice[1][1]:resolve(arg,message)
+    return framework.modules.resolvers.choice[1][1]:resolve(message,message.content,arg.choices)
   elseif argType == "role" then
-    return framework.modules.resolvers.role[1][1]:resolve(message,message.guild)
+    return framework.modules.resolvers.role[1][1]:resolve(message,message.content,arg)
   elseif argType == "channel" then
-    return framework.modules.resolvers.channel[1][1]:resolve(message,message.guild)
+    return framework.modules.resolvers.channel[1][1]:resolve(message,message.content,arg)
   elseif argType == "command" then
-    return framework.modules.resolvers.command[1][1]:resolve(message,arg.node)
+    --return framework.modules.resolvers.command[1][1]:resolve(message,arg.node)
   elseif argType == "duration" then
-    return framework.modules.resolvers.duration[1][1]:resolve(message.content)
+    return framework.modules.resolvers.duration[1][1]:resolve(message,message.content,arg)
   end
 end
 

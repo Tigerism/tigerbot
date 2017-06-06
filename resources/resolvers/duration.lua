@@ -74,8 +74,8 @@ function timeResolver:toHumanTime(seconds,shortTime)
     
 end
 
-function timeResolver:resolve(message,arg)
-	local content = arg or (type(message) == "table" and message.content or message)
+function timeResolver:resolve(message,content)
+	content = content:lower()
 	if content == "none" then return "none" end
 	local duration,day = string.match(content, '(%S+) (.*)')
 	if not day then day = content duration = content end
