@@ -15,7 +15,6 @@ function(message,args,flags)
           name = "choice"
         }
     }  
-    if not arg then return end
     newArgs.first = arg.choice
     arg = respond:args {
         {
@@ -25,7 +24,6 @@ function(message,args,flags)
           name = "choice"
         }
     } 
-    if not arg then return end
     newArgs.second = arg.choice
     arg = respond:args {
         {
@@ -34,7 +32,6 @@ function(message,args,flags)
           name = "item"
         }
     }
-    if not arg then return end
     newArgs.third = arg.item
     arg = respond:args {
         {
@@ -44,7 +41,6 @@ function(message,args,flags)
           node = true
         }
     }
-    if not arg then return end
     newArgs.node = arg.item
     
     local first,second = framework.modules.permissions[1]:splitFromNode(newArgs.node)
