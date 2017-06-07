@@ -1,7 +1,7 @@
 return {
     description = "clears 1-100 messages from the server.",
     args = {{"number","Please state the amount to prune."}},
-    permissions = {roles = {"Bot Commander"}},
+    permissions = {raw={"manageMessages"}},
     category = "mod"
 },
 function(message,args,flags)

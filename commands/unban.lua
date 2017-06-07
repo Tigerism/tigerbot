@@ -1,7 +1,7 @@
 return {
     description = "unban a user from the server.",
     args = {{"user","Please specify a user."},{"string","Please state the reason."}},
-    permissions = {roles = {"Bot Commander"}},
+    permissions = {raw={"banMembers"}},
     category = "mod"
 },
 function(message,args,flags)

@@ -1,7 +1,7 @@
 return {
     description = "kick a member from the server.",
     args = {{"user","Please specify a user."},{"string","Please state the kick reason."}},
-    permissions = {roles = {"Bot Commander"}},
+    permissions = {raw={"kickMembers"}},
     category = "mod"
 },
 function(message,args,flags)
