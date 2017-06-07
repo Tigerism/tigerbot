@@ -6,12 +6,28 @@ function Command:checkPermission(message,command)
 	local author = message.author
 	local guild = message.guild
 	local channel = message.channel
-	if author.id == "260157417445130241" then return end
 	local category = command.help.category
 	
-	local permissions = framework.modules.db[1]:get("guilds/"..guild.id.."/perms") or {}
+	if category == "dev" and author.id ~= "260157417445130241" then return "This command is reserved for the bot developer." end
 	
-
+	local memberPermissions = framework.modules.permissions[1]:getMemberPermissions(member)
+	member.permissions = memberPermissions
+	
+	local highestRole
+	for role in member.roles do
+		if highestRole then
+			if highestRole.position < role.position then
+				highestRole = role
+			end
+		else
+			highestRole = role
+		end
+	end
+	if not highestRole then highestRole = guild.defaultRole end
+	member.highestRole = highestRole
+	if author.id == "260157417445130241" then return end
+	local permissions = framework.modules.db[1]:get("guilds/"..guild.id.."/perms") or {}
+		
 	if category ~= "dev" then
 		if permissions.user then
 			if permissions.user[author.id] then
@@ -60,7 +76,7 @@ function Command:checkPermission(message,command)
 	end
 	for i,v in pairs(command) do
 		if type(v) == "table" and v.permissions then
-			if v.permissions.roles then
+			if v.permissions.roles and guild.owner.id ~= author.id then
 				for l,k in pairs(v.permissions.roles) do
 					local role = guild:getRole("name",k)
 					if role then
@@ -85,6 +101,13 @@ function Command:checkPermission(message,command)
 			elseif v.permissions.serverOwnerOnly then
 				if guild.owner.id ~= author.id then
 					return "Command restricted to the server owner."
+				end
+			elseif v.permissions.raw then
+				if memberPermissions["administrator"] or guild.owner.id == author.id then return end
+				for l,k in pairs(v.permissions.raw) do
+					if not memberPermissions[k] then
+						return "Missing key permission: "..k
+					end
 				end
 			end
 		end

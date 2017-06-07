@@ -12,6 +12,7 @@ return {
 },
 function(message,args,flags)
     local role
+    local member = message.member
     local mainArg = args.myArgs[1]
     if mainArg ~= "list" then
         local arg = respond:args {
@@ -21,7 +22,6 @@ function(message,args,flags)
                 name = "role"
             }
         }
-        if not arg then return end
         role = arg.role
     end
     if mainArg == "create" then
@@ -33,9 +33,12 @@ function(message,args,flags)
                 name = "choice"
             }
         }
-        if not arg then return end
-        framework.modules.db[1]:set("guilds/"..message.guild.id.."/autoroles/","autoroles",{[role.id] = arg.choice})
-        respond:success("Successfully **saved** your new autorole.")
+        if (role.position < member.highestRole.position) or message.guild.owner.id == message.author.id then
+            framework.modules.db[1]:set("guilds/"..message.guild.id.."/autoroles/","autoroles",{[role.id] = arg.choice})
+            respond:success("Successfully **saved** your new autorole.")
+        else
+            respond:error("Cannot create an autorole for a role that is higher than your highest role.")
+        end
     elseif mainArg == "remove" or mainArg == "delete" then
         framework.modules.db[1]:delete("guilds/"..message.guild.id.."/autoroles/"..role.id.."/")
         respond:success("Successfully **deleted** your autorole.")
