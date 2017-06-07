@@ -163,7 +163,7 @@ local function init(bot,...)
 		framework.scripts[i] = v
 		client[i] = v
 	end
-	
+	client.started = os.time()
 	registerModules()
 	return framework
 end
