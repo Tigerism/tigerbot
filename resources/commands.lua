@@ -123,6 +123,10 @@ function Command:makeCommand(message,name,path)
 		sleep = require("timer").sleep
 	},true)
 	if command then
+		if type(command) == "table" and command.error then
+			message.channel:sendMessage(":warning: This command has failed execution!\nError information: ``"..command.error.."``")
+			return
+		end
 		command = {command()}
 		return command
 	end
@@ -165,6 +169,7 @@ local function checkMatch(prefix,message)
 				table.remove(args,1)
 				local otherArgs = client.framework:split(table.concat(args," ")," | ")
 				local command = Command:makeCommand(message,i,v)
+				if not command then return end
 				command.name = i
 				command.flags = extractFlags(table.concat(args," "))
 				command.help = modules.help[1](command)
