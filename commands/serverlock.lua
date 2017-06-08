@@ -1,6 +1,6 @@
 
 return {
-    description = "prevents new joiners quickly, without the need to edit any permissions. Useful for raiders. Use **whitelist** to allow a person in**.",
+    description = "prevents new joiners quickly, without the need to edit any permissions. Useful for raiders. Use **whitelist** to allow a person in.",
     permissions = {raw={"manageGuild"}},
     args = {{"choice","Would you like to **enable** the serverlock, **disable** it, or **whitelist** a user?",choices={"enable","disable","whitelist"}}},
 },
