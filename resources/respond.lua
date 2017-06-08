@@ -56,13 +56,20 @@ local function isCorrect(message,arg)
   end
 end
 
+function respond:quit()
+  respond.pending[self.author.id] = nil
+  deActivate(self)
+end
+
 function respond:args(args)
   if respond.pending[self.author.id] then return end
   respond.pending[self.author.id] = self.channel.id
   local newArgs = {}
   local co = coroutine.running()
   for i,v in pairs(args) do
-    self.channel:sendMessage(v.prompt.."\nSay **cancel** to cancel.")
+    if v.prompt ~= "" then
+      self.channel:sendMessage(v.prompt.."\nSay **cancel** to cancel.")
+    end
     self.listener = function(message)
       if message.channel.id ~= self.channel.id then return end
       local content = message.content
