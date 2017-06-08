@@ -8,14 +8,23 @@ clock:on("min",function()
 	for i,v in pairs(pendingActions) do
 		for l,k in pairs(v) do
 			if os.time() >= k.expiresOn then
-				if k.type == "Ban" then
-					local guild = client:getGuild(k.guild)
-					if guild then
+				local guild = client:getGuild(k.guild)
+				if guild then
+					if k.type == "Ban" then
 						guild:unbanUser(client:getUser(k.user))
+					elseif k.type == "Mute" then
+						local member = guild:getMember(k.user)
+						if member then
+							for role in member.roles do
+								if role.name == "TigerMuted" then
+									member:removeRoles(role)
+								end
+							end
+						end
 					end
 				end
 				table.remove(pendingActions[k.guild],l)
-				framework.modules.db[1]:delete("pendingActions/"..k.guild.."/"..k.user)
+				framework.modules.db[1]:delete("pendingActions/"..k.guild.."/"..k.user)	
 			end
 		end
 	end

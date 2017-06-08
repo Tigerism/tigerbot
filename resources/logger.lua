@@ -29,7 +29,7 @@ function logger:newModLog(guild,user,options)
 			framework.modules.timedActions[1](true,guild.id,user.id,options)
 			framework.modules.db[1]:set("pendingActions/"..guild.id.."/"..user.id.."/","user",options)
 		else
-			if options.type == "Ban" then
+			if options.type == "Ban" or options.type == "Mute" then
 			--permanent action
 				options.duration = nil	
 			end
