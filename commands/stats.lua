@@ -14,7 +14,7 @@ return function(message,args,flags)
                 {name = "Library",value = "Discordia (Lua)",inline=true},
                 {name = "Guilds",value = client.guildCount,inline=true},
                 {name = "Shards",value = client.shardCount,inline=true},
-                {name = "Uptime",value = (client.started and modules.resolvers.duration[1][1]:toHumanTime(math.abs(os.time()-client.started),false)) or "bot just started...",inline=true},
+                {name = "Uptime",value = (client.started and modules.resolvers.duration[1][1]:toHumanTime(math.abs(os.time()-client.started),true)) or "bot just started...",inline=true},
                 {name = "Memory Usage",value = memUsage,inline=true},
                 
             }
