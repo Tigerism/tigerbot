@@ -33,7 +33,10 @@ local sandbox = {
     pairs = pairs,
     table = table,
     type = type,
+    collectgarbage = collectgarbage
 }
+
+local codedLines = {}
 
 local function executeLua(arg, msg)
 
@@ -43,8 +46,11 @@ local function executeLua(arg, msg)
 	arg = arg:gsub('```\n?', '') -- strip markdown codeblocks
 
 	local lines = {}
+	
 
 	sandbox.message = msg
+	sandbox.channel = msg.channel
+	sandbox.guild = msg.guild
 
 	sandbox.print = function(...)
 		table.insert(lines, printLine(...))
@@ -53,8 +59,10 @@ local function executeLua(arg, msg)
 	sandbox.p = function(...)
 		table.insert(lines, prettyLine(...))
 	end
+	
+    table.insert(codedLines,arg)
 
-	local fn, syntaxError = load(arg, 'Tiger 2.0', 't', sandbox)
+	local fn, syntaxError = load(table.concat(codedLines," "), 'Tiger 2.0', 't', sandbox)
 	if not fn then return msg:reply(code(syntaxError)) end
 
 	local success, runtimeError = pcall(fn)
@@ -65,9 +73,11 @@ local function executeLua(arg, msg)
 	if #lines > 1990 then -- truncate long messages
 		lines = lines:sub(1, 1990)
 	end
-
-	return msg:reply(code(lines))
-
+	
+    if #lines ~= 0 then
+	    return msg:reply(code(lines))
+	end
+	
 end
 
 
@@ -79,12 +89,10 @@ return {
     category = "dev"
 },
 function(message,args,flags)
-    local code = table.concat(args.stringArgs," ")
     if #args.stringArgs == 0 then
         --REPL MODE
-        local repl = true
         message:reply("**REPL MODE ENABLED.** Say **quit()** or **q()** to disable REPL.")
-        while repl do
+        while true do
             local arg = respond:args {
                 {
                   prompt = "",
