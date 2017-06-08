@@ -42,7 +42,7 @@ local function isCorrect(message,arg)
   elseif argType == "string" then
     return framework.modules.resolvers.string[1][1]:resolve(message,message.content,arg)
   elseif argType == "number" then
-    return framework.modules.resolvers.number[1][1]:resolve(message)
+    return framework.modules.resolvers.number[1][1]:resolve(message,message.content)
   elseif argType == "choice" or argType == "choices" then
     return framework.modules.resolvers.choice[1][1]:resolve(message,message.content,arg.choices)
   elseif argType == "role" then

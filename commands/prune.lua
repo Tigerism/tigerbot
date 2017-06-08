@@ -6,7 +6,9 @@ return {
 },
 function(message,args,flags)
     local amount = args.myArgs[1]
-    local result = message.channel:bulkDelete(amount)
+    local result = message.channel:bulkDelete(amount,function(message)
+        return not message.pinned
+    end)
     local prunedAmount = 0
     for message in result do
         prunedAmount = prunedAmount + 1
