@@ -134,10 +134,15 @@ function Command:makeCommand(message,name,path)
 end
 
 local function extractFlags(content)
-	local flags = {}
+	local flags = {table={},array={}}
 	for m,b in string.gmatch(content,"%-%-(%w+)([^%-]*)") do
-		flags[m] = b:trim()
+		content = content:gsub(m,"")
+		content = content:gsub(b,"")
+		content = content:gsub("-","")
+		flags.array[m] = b:trim()
+		table.insert(flags.table,{m,b:trim()})
 	end
+	
 	return flags
 end
 
@@ -163,6 +168,9 @@ local function checkMatch(prefix,message)
 	local beginning = content:sub(1,prefix:len()):lower()
 	if beginning == prefix:lower() then
 		local after = content:sub(beginning:len()+1)
+		local newAfter = content:sub(beginning:len()+1)
+		after = after:sub(1,(after:find("-%-") and after:find("-%-") -1) or after:len())
+		after = after:trim()
 		local args = client.framework:split(after," ")
 		for i,v in pairs(Command.commands) do
 			if args[1] and args[1]:lower() == i:lower() then
@@ -171,7 +179,8 @@ local function checkMatch(prefix,message)
 				local command = Command:makeCommand(message,i,v)
 				if not command then return end
 				command.name = i
-				command.flags = extractFlags(table.concat(args," "))
+				local flags
+				command.flags = extractFlags(newAfter)
 				command.help = modules.help[1](command)
 				
 				local help = command.help
@@ -179,7 +188,7 @@ local function checkMatch(prefix,message)
 				local isSubcommand = args[1] and help.subcommands[args[1]]
 				command.isSubcommand = isSubcommand
 				
-				if command.flags["help"] then
+				if command.flags.array["help"] then
 					if not isSubcommand then
 						channel:sendMessage({embed={
 							title=command.name,
@@ -187,7 +196,8 @@ local function checkMatch(prefix,message)
 							fields = {
 								{name="category",value=help.category,inline=false},
 								{name="subcommands",value=(#help.listSubcommands > 0 and table.concat(help.listSubcommands,"\n") or "none"),inline=false},
-								{name="flags",value=(#help.flags > 0 and table.concat(help.flags,"\n") or "none"),inline=false}
+								{name="flags",value=(#help.flags > 0 and table.concat(help.flags,"\n") or "none"),inline=false},
+								{name="examples",value=(#help.examples > 0 and table.concat(help.examples,"\n") or "none"),inline=false}
 							}
 						}})
 					else
