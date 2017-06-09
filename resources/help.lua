@@ -1,5 +1,5 @@
 return function(command)
-    local info = {name=command.name,subcommands={},listSubcommands={},flags={}}
+    local info = {name=command.name,subcommands={},listSubcommands={},flags={},examples={}}
     for i,v in pairs(command) do
         if type(v) == "table" then
             if v.description or v.fullDescription then
@@ -7,9 +7,16 @@ return function(command)
             end
             info.category = info.category or (v.category or "misc")
             if v.flags then
-                for l,k in pairs(v) do
+                for l,k in pairs(v.flags) do
                     if l ~= "type" then
                         table.insert(info.flags,l.." ➜ "..k)
+                    end
+                end
+            end
+            if v.examples then
+                for l,k in pairs(v.examples) do
+                    if l ~= "type" then
+                        table.insert(info.examples,k)
                     end
                 end
             end
