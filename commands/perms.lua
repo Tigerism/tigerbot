@@ -3,7 +3,8 @@ return {
         serverOwnerOnly = true
         
     },
-    category = "admin"
+    category = "admin",
+    description = locale("perms.description")
 },
 function(message,args,flags)
     local newArgs = {}
