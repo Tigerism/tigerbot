@@ -51,11 +51,11 @@ return function(message,args,flags)
             end
         end
     else
+        embed.thumbnail = {url=author.avatarUrl}
+        embed.title = author.username.."#"..author.discriminator
+        embed.description = "("..author.id..")"  
         for i,v in pairs(options) do
             table.insert(embed.fields,v)
-            embed.thumbnail = {url=author.avatarUrl}
-            embed.title = author.username.."#"..author.discriminator
-            embed.description = "("..author.id..")"
         end
     end
     
