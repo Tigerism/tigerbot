@@ -27,7 +27,10 @@ local function generateCommandHelp(message)
         end
     end
     local newMsg = channel:sendMessage{embed=embed}
-    modules.listeners.reactions[1][1]:newReactionMenu(message,newMsg,fields)
+    modules.listeners.reactions[1][1]:newReactionMenu(message,newMsg,fields,{
+        startPage = {title = embed.title,description = embed.description},
+        startNumber = 0
+    })
 end
 
 

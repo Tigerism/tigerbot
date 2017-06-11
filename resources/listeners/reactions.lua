@@ -4,27 +4,62 @@ local info = "ℹ"
 local leftArrow = "⬅"
 local rightArrow = "➡"
 local wasteBin = "🗑"
-	
-function reactions:newReactionMenu(oldMessage,msg,fields,options)
+
+local timer = require("timer")
+
+local function turnPage(menu,page)
+	local embed = {}
+	local options = menu.options
+	local type = options.type or "fields"
+	local resultsPerPage = options.resultsPerPage or 5
+	if page == 0 then
+		if options.startPage then
+			embed = options.startPage
+			menu.msg:setEmbed(embed)
+			menu.page = 0
+		end
+	else
+		if type == "fields" then
+			local fields = modules.pagination[1]:toEmbed(page,menu.items,resultsPerPage)
+			if #fields ~= 0 then
+				menu.page = page
+				embed.fields = fields
+				embed = embed
+			end
+		elseif type == "image" then
+			if menu.items[page] then
+				menu.page = page
+				embed.image = {url=menu.items[page]}
+				embed = embed
+			end
+		end
+	end
+	if not embed.description and options.description then
+		embed.description = options.description
+	end
+	if embed.fields or embed.image then
+		menu.msg:setEmbed(embed)
+	end	
+end
+
+function reactions:newReactionMenu(originalMsg,msg,items,options)
 	options = options or {}
 	coroutine.wrap(function()
-		msg:addReaction(info)
+		if options.startPage then
+			msg:addReaction(info)
+		end
+		timer.sleep(1100)
 		msg:addReaction(leftArrow)
+		timer.sleep(1100)
 		msg:addReaction(rightArrow)
+		timer.sleep(1100)
 		msg:addReaction(wasteBin)
 	end)()
-	if options.startingPage then
-		local embed = msg.embed
-		local fields = modules.pagination[1]:toEmbed(options.startingPage,fields,5)
-		if #fields == 0 then
-			--embed.description = embed.description.."\n\n**There's no data to show.**"
-		else
-			embed.fields = fields
-		end
-		msg:setEmbed(embed)
-	end
-	reactions.menus[msg.id] = {oldMessage=oldMessage,msg=msg,infoEmbed=msg.embed,fields=fields,page=(options.startingPage or 0),emojis={leftArrow,rightArrow},options=options}
+	local startNumber = options.startNumber or 1
+	reactions.menus[msg.id] = {items=items,options=options,msg=msg,original=originalMsg,page=startNumber}
+	turnPage(reactions.menus[msg.id],startNumber)
 end
+
 
 local function reactionAdd(reaction,user)
 	if user.id == client.user.id then return end
@@ -33,51 +68,23 @@ local function reactionAdd(reaction,user)
 	local guild = message.guild
 	local member = user:getMembership(guild)
 	local menu = reactions.menus[message.id]
+	local options = menu.options
+	options.type = options.type or "fields"
+	local resultsPerPage = options.resultsPerPage or 5
 	if menu then
 		message:removeReaction(emoji,member)
-		local embed = {}
-		if user.id == menu.oldMessage.author.id then
-			if emoji == leftArrow then
-				local fields = modules.pagination[1]:toEmbed(menu.page-1,menu.fields,5)
-				if #fields > 0 then
-					menu.page = menu.page - 1
-					embed.fields = fields
-				end
-			elseif emoji == rightArrow then
-				local fields = modules.pagination[1]:toEmbed(menu.page+1,menu.fields,5)
-				if #fields > 0 then
-					menu.page = menu.page + 1
-					embed.fields = fields
-				end
-			elseif emoji == info then
-				if menu.options.infoPage then
-					embed = menu.options.infoPage
-				else
-					embed = menu.infoEmbed
-				end
-				menu.page = 0
-			elseif emoji == wasteBin then
-				message:delete()
-				menu.oldMessage:delete()
-			end
-			if emoji ~= info then
-				if not embed.fields or #embed.fields == 0  then
-					if embed.description then
-						embed.description = embed.description.."\n\n**There's no data to show.**"
-					else
-						embed.description = "**There's no data to show.**"
-					end
-				else
-					embed.description = menu.options.description or embed.description or ""
-				end
-			end
-			if emoji == leftArrow or emoji == rightArrow then
-				if embed.fields and #embed.fields ~= 0 then
-					message:setEmbed(embed)
-				end
-			elseif emoji == info then
-				message:setEmbed(embed)
-			end
+		if user.id ~= menu.original.author.id then return end
+		local page = menu.page
+		if emoji == rightArrow then
+			turnPage(menu,menu.page+1)
+		elseif emoji == leftArrow then
+			turnPage(menu,menu.page-1)
+		elseif emoji == info then
+			turnPage(menu,0)
+		elseif emoji == wasteBin then
+			message:delete()
+			menu.original:delete()
+			reactions.menus[message.id] = nil
 		end
 	end
 end
