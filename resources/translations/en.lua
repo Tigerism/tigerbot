@@ -70,5 +70,8 @@ return {
     },
     perms = {
         description = "configure command permissions."
+    },
+    giphy = {
+        description = "searches giphy for a query"
     }
 }
