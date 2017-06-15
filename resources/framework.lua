@@ -144,6 +144,7 @@ local function registerModules()
 	framework.modules["respond"] = framework:loadModule(module.dir.."/respond.lua")
 	framework.modules["permissions"] = framework:loadModule(module.dir.."/permissions.lua")
 	framework.modules["timedActions"] = framework:loadModule(module.dir.."/timedActions.lua")
+	framework.modules["games"] = framework:loadModules(module.dir.."/games/")
 	client.framework = framework
 end
 
@@ -164,6 +165,7 @@ local function init(bot,...)
 		client[i] = v
 	end
 	client.started = os.time()
+	client.emitters = {}
 	registerModules()
 	return framework
 end
