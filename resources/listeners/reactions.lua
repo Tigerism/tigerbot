@@ -68,24 +68,25 @@ local function reactionAdd(reaction,user)
 	local guild = message.guild
 	local member = user:getMembership(guild)
 	local menu = reactions.menus[message.id]
+	
+	if not menu then return end
 	local options = menu.options
 	options.type = options.type or "fields"
 	local resultsPerPage = options.resultsPerPage or 5
-	if menu then
-		message:removeReaction(emoji,member)
-		if user.id ~= menu.original.author.id then return end
-		local page = menu.page
-		if emoji == rightArrow then
-			turnPage(menu,menu.page+1)
-		elseif emoji == leftArrow then
-			turnPage(menu,menu.page-1)
-		elseif emoji == info then
-			turnPage(menu,0)
-		elseif emoji == wasteBin then
-			message:delete()
-			menu.original:delete()
-			reactions.menus[message.id] = nil
-		end
+	
+	message:removeReaction(emoji,member)
+	if user.id ~= menu.original.author.id then return end
+	local page = menu.page
+	if emoji == rightArrow then
+		turnPage(menu,menu.page+1)
+	elseif emoji == leftArrow then
+		turnPage(menu,menu.page-1)
+	elseif emoji == info then
+		turnPage(menu,0)
+	elseif emoji == wasteBin then
+		message:delete()
+		menu.original:delete()
+		reactions.menus[message.id] = nil
 	end
 end
 
