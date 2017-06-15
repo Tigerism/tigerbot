@@ -3,7 +3,7 @@ local uv = require("uv")
 return function(message,args,flags)
     
     local memUsage = math.floor(uv.resident_set_memory()/1024/1024)
-    memUsage = tostring(memUsage.." mb ("..math.floor((memUsage/uv.get_total_memory()))).."%)"
+    memUsage = tostring(memUsage.." mb ("..math.floor(memUsage/(uv.get_total_memory()/1024/1024)*100)).."%)" 
     
     message.channel:sendMessage {
         embed = {
