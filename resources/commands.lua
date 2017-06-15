@@ -167,6 +167,7 @@ local function checkMatch(prefix,message)
 	local channel = message.channel
 	local beginning = content:sub(1,prefix:len()):lower()
 	if beginning == prefix:lower() then
+		if not client.framework then message.channel:sendMessage("Please wait until the bot loads up.") return end
 		local after = content:sub(beginning:len()+1)
 		local newAfter = content:sub(beginning:len()+1)
 		after = after:sub(1,(after:find("-%-") and after:find("-%-") -1) or after:len())
